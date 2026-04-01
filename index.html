@@ -1,0 +1,2300 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#2563eb">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="FinPlan Pro">
+<link rel="manifest" href="/manifest.json">
+<title>💎 FinPlan Pro — Family Financial Planner</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --primary:#2563eb;--primary-dark:#1e40af;
+  --success:#10b981;--danger:#ef4444;--warning:#f59e0b;
+  --purple:#8b5cf6;--pink:#ec4899;--teal:#14b8a6;
+  --dark:#0f172a;--gray:#64748b;--light:#f8fafc;
+  --gray-light:#e2e8f0;
+  --needs:#3b82f6;--savings:#10b981;--wants:#f59e0b;
+}
+body{font-family:'Plus Jakarta Sans',sans-serif;background:linear-gradient(135deg,#0f172a,#1e293b);min-height:100vh;color:#1e293b}
+
+/* ===== LOGIN SCREEN ===== */
+#loginScreen{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:20px}
+.login-box{background:#fff;border-radius:24px;padding:40px 36px;max-width:420px;width:100%;box-shadow:0 30px 60px rgba(0,0,0,.4);animation:popIn .4s ease}
+@keyframes popIn{from{opacity:0;transform:scale(.9)}to{opacity:1;transform:scale(1)}}
+.login-logo{text-align:center;margin-bottom:28px}
+.login-logo h1{font-size:28px;font-weight:800;color:var(--primary);margin-bottom:4px}
+.login-logo p{color:var(--gray);font-size:14px}
+.user-card{display:flex;align-items:center;gap:14px;padding:14px 16px;border:2px solid var(--gray-light);border-radius:12px;cursor:pointer;transition:all .2s;margin-bottom:10px}
+.user-card:hover{border-color:var(--primary);background:#eff6ff}
+.user-avatar{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;color:#fff;flex-shrink:0}
+.user-info-name{font-weight:700;font-size:15px}
+.user-info-sub{font-size:12px;color:var(--gray)}
+.divider{text-align:center;color:var(--gray);font-size:13px;margin:16px 0;position:relative}
+.divider::before,.divider::after{content:'';position:absolute;top:50%;width:42%;height:1px;background:var(--gray-light)}
+.divider::before{left:0}.divider::after{right:0}
+
+/* ===== PIN SCREEN ===== */
+#pinScreen{display:none;align-items:center;justify-content:center;min-height:100vh;padding:20px}
+.pin-box{background:#fff;border-radius:24px;padding:40px 36px;max-width:360px;width:100%;text-align:center;box-shadow:0 30px 60px rgba(0,0,0,.4)}
+.pin-dots{display:flex;justify-content:center;gap:12px;margin:20px 0}
+.pin-dot{width:16px;height:16px;border-radius:50%;border:2px solid var(--gray-light);transition:all .2s}
+.pin-dot.filled{background:var(--primary);border-color:var(--primary)}
+.pin-pad{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:20px}
+.pin-key{padding:18px;background:#f8fafc;border:2px solid var(--gray-light);border-radius:12px;font-size:20px;font-weight:700;cursor:pointer;transition:all .2s;font-family:'Plus Jakarta Sans',sans-serif}
+.pin-key:hover{background:#eff6ff;border-color:var(--primary);color:var(--primary)}
+.pin-key:active{transform:scale(.95)}
+.pin-key.del{font-size:16px;color:var(--danger)}
+.pin-key.zero{grid-column:2}
+
+/* ===== APP ===== */
+#appScreen{display:none}
+.app{max-width:1400px;margin:0 auto;padding:16px}
+
+/* ===== HEADER ===== */
+.header{background:rgba(255,255,255,.07);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.1);border-radius:16px;padding:16px 22px;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px}
+.header-left h1{color:#fff;font-size:20px;font-weight:800;margin-bottom:2px}
+.header-left p{color:#94a3b8;font-size:12px}
+.header-right{display:flex;align-items:center;gap:10px}
+.user-chip{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.1);padding:8px 14px;border-radius:10px;color:#fff;font-size:13px;font-weight:600}
+.logout-btn{padding:8px 14px;background:rgba(239,68,68,.2);border:1px solid rgba(239,68,68,.4);color:#fca5a5;border-radius:8px;cursor:pointer;font-size:12px;font-weight:700;transition:all .2s}
+.logout-btn:hover{background:rgba(239,68,68,.3)}
+
+/* ===== NAV ===== */
+.nav{display:flex;gap:5px;margin-bottom:14px;background:rgba(255,255,255,.05);padding:5px;border-radius:13px;overflow-x:auto;scrollbar-width:none}
+.nav::-webkit-scrollbar{display:none}
+.nav-btn{padding:9px 16px;background:transparent;border:none;color:#94a3b8;border-radius:9px;cursor:pointer;font-weight:600;font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;white-space:nowrap;transition:all .2s}
+.nav-btn:hover{background:rgba(255,255,255,.08);color:#fff}
+.nav-btn.active{background:var(--primary);color:#fff}
+
+/* ===== TAB ===== */
+.tab{display:none}.tab.active{display:block;animation:fadeUp .3s ease}
+@keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+/* ===== CARDS ===== */
+.card{background:#fff;border-radius:16px;padding:20px;box-shadow:0 4px 16px rgba(0,0,0,.08);margin-bottom:14px}
+.card-title{font-size:16px;font-weight:700;margin-bottom:14px;color:#0f172a;display:flex;align-items:center;gap:8px}
+
+/* ===== STATS ===== */
+.stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:14px}
+.stat{background:#fff;border-radius:14px;padding:16px;box-shadow:0 4px 16px rgba(0,0,0,.07)}
+.stat-label{font-size:11px;font-weight:700;color:var(--gray);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
+.stat-value{font-size:22px;font-weight:800;font-family:'JetBrains Mono',monospace;margin-bottom:3px}
+.stat-sub{font-size:11px;color:var(--gray)}
+
+/* ===== HERO ===== */
+.hero{border-radius:18px;padding:26px;color:#fff;margin-bottom:14px;text-align:center}
+.hero-label{font-size:11px;font-weight:700;opacity:.85;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px}
+.hero-value{font-size:38px;font-weight:800;font-family:'JetBrains Mono',monospace;margin-bottom:6px}
+.hero-sub{font-size:13px;opacity:.9}
+
+/* ===== PROGRESS ===== */
+.progress-wrap{margin:6px 0}
+.progress-bar{height:10px;background:#e2e8f0;border-radius:20px;overflow:hidden}
+.progress-fill{height:100%;border-radius:20px;transition:width .8s ease}
+
+/* ===== FORMS ===== */
+.form-group{margin-bottom:14px}
+.form-group label{display:block;font-weight:600;font-size:13px;margin-bottom:5px;color:#1e293b}
+.form-group input,.form-group select,.form-group textarea{width:100%;padding:11px 13px;border:2px solid var(--gray-light);border-radius:10px;font-family:'Plus Jakarta Sans',sans-serif;font-size:15px;transition:all .2s;background:#fff}
+.form-group input:focus,.form-group select:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px rgba(37,99,235,.1)}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+
+/* ===== BUTTONS ===== */
+.btn{padding:11px 18px;border:none;border-radius:10px;font-weight:700;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;font-size:14px;transition:all .2s}
+.btn-primary{background:linear-gradient(135deg,var(--primary),var(--primary-dark));color:#fff}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:0 6px 16px rgba(37,99,235,.3)}
+.btn-success{background:var(--success);color:#fff}
+.btn-danger{background:var(--danger);color:#fff}
+.btn-warning{background:var(--warning);color:#fff}
+.btn-ghost{background:#f1f5f9;color:var(--gray)}
+.btn-block{width:100%}
+.btn-sm{padding:7px 12px;font-size:12px;border-radius:8px}
+
+/* ===== MODAL ===== */
+.modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.7);z-index:9999;padding:16px;overflow-y:auto;align-items:flex-start;justify-content:center}
+.modal.active{display:flex}
+.modal-box{background:#fff;border-radius:20px;padding:26px;max-width:540px;width:100%;margin:auto;position:relative;animation:fadeUp .3s ease}
+.modal-close{position:absolute;top:14px;right:14px;background:#f1f5f9;border:none;width:30px;height:30px;border-radius:50%;font-size:15px;cursor:pointer;transition:all .2s}
+.modal-title{font-size:19px;font-weight:800;margin-bottom:18px}
+
+/* ===== PERIOD BUTTONS ===== */
+.period-wrap{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:14px}
+.period-btn{padding:7px 14px;background:#fff;border:2px solid var(--gray-light);border-radius:8px;cursor:pointer;font-weight:600;font-size:12px;transition:all .2s;font-family:'Plus Jakarta Sans',sans-serif}
+.period-btn.active{background:var(--primary);border-color:var(--primary);color:#fff}
+
+/* ===== TRANSACTIONS ===== */
+.tx-item{display:flex;justify-content:space-between;align-items:center;padding:13px;background:#f8fafc;border-radius:12px;margin-bottom:7px;border-left:4px solid var(--gray-light);transition:all .2s}
+.tx-item:hover{background:#f1f5f9;transform:translateX(3px)}
+.tx-item.income{border-left-color:var(--success)}
+.tx-item.expense{border-left-color:var(--danger)}
+.tx-name{font-weight:700;font-size:14px;margin-bottom:2px}
+.tx-meta{font-size:12px;color:var(--gray);display:flex;gap:8px;flex-wrap:wrap}
+.tx-amount{font-family:'JetBrains Mono',monospace;font-weight:800;font-size:15px;margin-right:8px}
+.tx-amount.income{color:var(--success)}
+.tx-amount.expense{color:var(--danger)}
+.del-btn{padding:5px 9px;background:#fee2e2;color:#991b1b;border:none;border-radius:6px;cursor:pointer;font-size:11px;font-weight:700;transition:all .2s;flex-shrink:0}
+.del-btn:hover{background:#fecaca}
+
+/* ===== POS CARDS ===== */
+.pos-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
+.pos-card{background:#fff;border-radius:14px;padding:16px;box-shadow:0 4px 16px rgba(0,0,0,.07);border-left:4px solid var(--primary);transition:all .2s}
+.pos-card:hover{transform:translateY(-3px);box-shadow:0 12px 30px rgba(0,0,0,.12)}
+.pos-card.needs{border-left-color:var(--needs)}
+.pos-card.savings{border-left-color:var(--savings)}
+.pos-card.wants{border-left-color:var(--wants)}
+.pos-badge{font-size:10px;padding:3px 8px;border-radius:20px;font-weight:700;text-transform:uppercase}
+.pos-badge.needs{background:#dbeafe;color:#1e40af}
+.pos-badge.savings{background:#d1fae5;color:#065f46}
+.pos-badge.wants{background:#fef3c7;color:#92400e}
+
+/* ===== BUDGET PLAN ===== */
+.budget-bucket{background:#fff;border-radius:16px;padding:18px;margin-bottom:14px;box-shadow:0 4px 16px rgba(0,0,0,.07)}
+.bucket-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:8px}
+.bucket-title{font-size:16px;font-weight:700;display:flex;align-items:center;gap:8px}
+.bucket-pct-badge{padding:4px 12px;border-radius:20px;font-size:12px;font-weight:700}
+.bucket-amount{font-family:'JetBrains Mono',monospace;font-weight:800;font-size:18px}
+.bucket-items{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px;margin-top:12px}
+.bucket-item{padding:10px 12px;border-radius:10px;border-left:3px solid}
+.bucket-item-name{font-size:12px;font-weight:600;margin-bottom:3px}
+.bucket-item-amount{font-family:'JetBrains Mono',monospace;font-weight:800;font-size:14px}
+.bucket-item-sub{font-size:11px;color:var(--gray);margin-top:2px}
+
+/* ===== DEBT ===== */
+.debt-card{background:#fff;border-radius:14px;padding:16px;box-shadow:0 4px 16px rgba(0,0,0,.07);margin-bottom:12px;border-left:4px solid var(--warning)}
+.debt-card.lunas{border-left-color:var(--success)}
+
+/* ===== GOAL CARD ===== */
+.goal-card{background:#fff;border-radius:14px;padding:16px;box-shadow:0 4px 16px rgba(0,0,0,.07);margin-bottom:12px}
+
+/* ===== INSIGHT CARD ===== */
+.insight-card{border-radius:13px;padding:15px;margin-bottom:11px;border-left:4px solid}
+.insight-card.success{background:#f0fdf4;border-color:var(--success)}
+.insight-card.warning{background:#fffbeb;border-color:var(--warning)}
+.insight-card.danger{background:#fef2f2;border-color:var(--danger)}
+.insight-card.info{background:#eff6ff;border-color:var(--primary)}
+
+/* ===== ACHIEVEMENT ===== */
+.ach-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px}
+.ach-card{background:#fff;padding:14px;border-radius:12px;text-align:center;box-shadow:0 4px 12px rgba(0,0,0,.07);transition:all .2s}
+.ach-card.locked{opacity:.3}
+.ach-card:hover:not(.locked){transform:scale(1.04)}
+
+/* ===== TIMELINE ===== */
+.timeline-item{display:flex;gap:12px;margin-bottom:16px;position:relative}
+.timeline-dot{flex-shrink:0;width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;z-index:1}
+.timeline-line{position:absolute;left:18px;top:38px;width:2px;height:calc(100% + 6px);background:#e2e8f0}
+
+/* ===== TIP CARD ===== */
+.tip-card{background:linear-gradient(135deg,#667eea,#764ba2);border-radius:16px;padding:18px;color:#fff;margin-bottom:14px}
+
+/* ===== ARTICLES ===== */
+.article-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px}
+.article-card{background:#fff;border-radius:14px;padding:18px;box-shadow:0 4px 16px rgba(0,0,0,.07);cursor:pointer;transition:all .2s}
+.article-card:hover{transform:translateY(-3px);box-shadow:0 12px 30px rgba(0,0,0,.12)}
+
+/* ===== EMPTY ===== */
+.empty{text-align:center;padding:36px 20px;color:var(--gray)}
+.empty-icon{font-size:44px;opacity:.3;margin-bottom:10px}
+
+/* ===== TEMPLATE POS ===== */
+.template-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;margin-bottom:14px}
+.template-btn{padding:10px;border:2px solid var(--gray-light);border-radius:10px;cursor:pointer;text-align:center;transition:all .2s;background:#fff;font-family:'Plus Jakarta Sans',sans-serif}
+.template-btn:hover{border-color:var(--primary);background:#eff6ff}
+.template-btn.selected{border-color:var(--primary);background:#eff6ff}
+.template-icon{font-size:24px;margin-bottom:4px}
+.template-name{font-size:12px;font-weight:700}
+.template-cat{font-size:10px;color:var(--gray)}
+
+/* ===== SETUP WIZARD ===== */
+#setupScreen{display:none;align-items:center;justify-content:center;min-height:100vh;padding:20px}
+.setup-box{background:#fff;border-radius:24px;padding:36px;max-width:560px;width:100%;box-shadow:0 30px 60px rgba(0,0,0,.4);animation:popIn .4s ease}
+.step-indicator{display:flex;gap:6px;margin-bottom:24px;justify-content:center}
+.step-dot{width:8px;height:8px;border-radius:50%;background:#e2e8f0;transition:all .3s}
+.step-dot.active{background:var(--primary);width:24px;border-radius:4px}
+.step-dot.done{background:var(--success)}
+
+/* ===== SCROLLBAR ===== */
+::-webkit-scrollbar{width:5px}
+::-webkit-scrollbar-track{background:var(--gray-light);border-radius:10px}
+::-webkit-scrollbar-thumb{background:var(--gray);border-radius:10px}
+
+/* ===== RESPONSIVE ===== */
+@media(max-width:640px){
+  .app{padding:10px}
+  .hero-value{font-size:28px}
+  .stat-grid{grid-template-columns:1fr 1fr}
+  .form-row{grid-template-columns:1fr}
+  .bucket-items{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- ==================== LOGIN SCREEN ==================== -->
+<div id="loginScreen">
+  <div class="login-box">
+    <div class="login-logo">
+      <div style="font-size:48px;margin-bottom:10px">💎</div>
+      <h1>FinPlan Pro</h1>
+      <p>Family Financial Planner · Smart & Simple</p>
+    </div>
+
+    <div id="userList"></div>
+
+    <div class="divider">atau</div>
+
+    <button class="btn btn-primary btn-block" onclick="showCreateUser()" style="margin-top:8px">
+      ✨ Buat Akun Baru
+    </button>
+
+    <p style="text-align:center;font-size:12px;color:var(--gray);margin-top:16px;line-height:1.6">
+      Data tersimpan aman di perangkat Anda.<br>Tidak perlu internet untuk menggunakan app ini.
+    </p>
+  </div>
+</div>
+
+<!-- ==================== PIN SCREEN ==================== -->
+<div id="pinScreen" style="display:none;align-items:center;justify-content:center;min-height:100vh;padding:20px">
+  <div class="pin-box">
+    <div style="font-size:36px;margin-bottom:10px" id="pinUserAvatar">👤</div>
+    <h2 style="font-size:20px;font-weight:800;margin-bottom:4px" id="pinUserName">Loading...</h2>
+    <p style="color:var(--gray);font-size:13px;margin-bottom:4px">Masukkan PIN 4 digit</p>
+    <p id="pinError" style="color:var(--danger);font-size:12px;font-weight:600;height:16px"></p>
+    <div class="pin-dots">
+      <div class="pin-dot" id="dot0"></div>
+      <div class="pin-dot" id="dot1"></div>
+      <div class="pin-dot" id="dot2"></div>
+      <div class="pin-dot" id="dot3"></div>
+    </div>
+    <div class="pin-pad">
+      <button class="pin-key" onclick="pinKey('1')">1</button>
+      <button class="pin-key" onclick="pinKey('2')">2</button>
+      <button class="pin-key" onclick="pinKey('3')">3</button>
+      <button class="pin-key" onclick="pinKey('4')">4</button>
+      <button class="pin-key" onclick="pinKey('5')">5</button>
+      <button class="pin-key" onclick="pinKey('6')">6</button>
+      <button class="pin-key" onclick="pinKey('7')">7</button>
+      <button class="pin-key" onclick="pinKey('8')">8</button>
+      <button class="pin-key" onclick="pinKey('9')">9</button>
+      <button class="pin-key pin-key zero" onclick="pinKey('0')">0</button>
+      <button class="pin-key del" onclick="pinDel()">⌫</button>
+    </div>
+    <button onclick="backToLogin()" style="margin-top:16px;background:none;border:none;color:var(--gray);cursor:pointer;font-size:13px;font-weight:600">← Ganti Akun</button>
+  </div>
+</div>
+
+<!-- ==================== SETUP WIZARD ==================== -->
+<div id="setupScreen" style="display:none;align-items:center;justify-content:center;min-height:100vh;padding:20px">
+  <div class="setup-box">
+    <div class="step-indicator">
+      <div class="step-dot active" id="sd0"></div>
+      <div class="step-dot" id="sd1"></div>
+      <div class="step-dot" id="sd2"></div>
+    </div>
+
+    <!-- Step 0: Profile -->
+    <div id="step0">
+      <div style="text-align:center;margin-bottom:20px">
+        <div style="font-size:40px;margin-bottom:8px">👨‍👩‍👧‍👦</div>
+        <h2 style="font-size:22px;font-weight:800;margin-bottom:4px">Profil Keluarga</h2>
+        <p style="color:var(--gray);font-size:13px">Buat akun baru — data tersimpan aman di perangkat</p>
+      </div>
+      <div class="form-group">
+        <label>Nama / Panggilan</label>
+        <input type="text" id="newName" placeholder="Contoh: Big Bos, Keluarga Budi, dll">
+      </div>
+      <div class="form-group">
+        <label>Emoji Avatar</label>
+        <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:6px" id="avatarPicker">
+          👨‍👩‍👧‍👦 👨‍💼 👩‍💼 🧑‍💻 👨‍🍳 🧑‍🎨 💎 🦁 🐯 🦊 🚀 ⭐
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Jumlah Anak</label>
+          <select id="newChildren">
+            <option value="0">Belum ada</option>
+            <option value="1">1 Anak</option>
+            <option value="2" selected>2 Anak</option>
+            <option value="3">3 Anak</option>
+            <option value="4">4+ Anak</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Status Tinggal</label>
+          <select id="newHousing">
+            <option value="ngontrak">Ngontrak/Kos</option>
+            <option value="sendiri">Rumah Sendiri</option>
+            <option value="orangtua">Rumah Ortu</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>PIN 4 Digit</label>
+        <input type="password" id="newPin" maxlength="4" placeholder="****" inputmode="numeric" style="letter-spacing:8px;font-size:20px;text-align:center">
+      </div>
+      <button class="btn btn-primary btn-block" onclick="setupNext(0)">Lanjut →</button>
+    </div>
+
+    <!-- Step 1: Income -->
+    <div id="step1" style="display:none">
+      <div style="text-align:center;margin-bottom:20px">
+        <div style="font-size:40px;margin-bottom:8px">💰</div>
+        <h2 style="font-size:22px;font-weight:800;margin-bottom:4px">Income Bulanan</h2>
+        <p style="color:var(--gray);font-size:13px">Masukkan total penghasilan per bulan</p>
+      </div>
+      <div class="form-group">
+        <label>👤 Income Saya (Rp/bulan)</label>
+        <input type="text" id="newIncome1" placeholder="5.000.000" inputmode="numeric">
+      </div>
+      <div class="form-group">
+        <label>👥 Income Pasangan (Rp/bulan) — Opsional</label>
+        <input type="text" id="newIncome2" placeholder="0" inputmode="numeric">
+      </div>
+      <div style="background:#f0fdf4;padding:14px;border-radius:10px;margin-bottom:16px">
+        <div style="font-size:12px;color:var(--gray);margin-bottom:4px">💎 Total Income:</div>
+        <div style="font-size:28px;font-weight:800;font-family:'JetBrains Mono',monospace;color:var(--success)" id="incomePreviewSetup">Rp 0</div>
+      </div>
+      <button class="btn btn-primary btn-block" onclick="setupNext(1)">Lanjut →</button>
+      <button onclick="setupBack(0)" style="margin-top:8px;width:100%;background:none;border:none;color:var(--gray);cursor:pointer;font-size:13px;font-weight:600">← Kembali</button>
+    </div>
+
+    <!-- Step 2: Budget Rule -->
+    <div id="step2" style="display:none">
+      <div style="text-align:center;margin-bottom:20px">
+        <div style="font-size:40px;margin-bottom:8px">📊</div>
+        <h2 style="font-size:22px;font-weight:800;margin-bottom:4px">Aturan Budget</h2>
+        <p style="color:var(--gray);font-size:13px">Set persentase alokasi income Anda</p>
+      </div>
+
+      <div style="background:#eff6ff;padding:14px;border-radius:10px;margin-bottom:16px;font-size:13px;color:var(--primary);font-weight:600">
+        💡 Total harus 100%. Anda bisa ubah kapan saja di Settings.
+      </div>
+
+      <!-- Quick templates -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px">
+        <button onclick="applyBudgetTemplate(50,40,10)" style="padding:10px;border:2px solid var(--gray-light);border-radius:10px;cursor:pointer;background:#fff;font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:700;transition:all .2s" onmouseover="this.style.borderColor='var(--primary)'" onmouseout="this.style.borderColor='var(--gray-light)'">
+          <div style="font-size:16px;margin-bottom:4px">⭐</div>
+          <div>50/40/10</div>
+          <div style="color:var(--gray);font-size:10px">Needs/Savings/Wants</div>
+        </button>
+        <button onclick="applyBudgetTemplate(50,30,20)" style="padding:10px;border:2px solid var(--gray-light);border-radius:10px;cursor:pointer;background:#fff;font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:700;transition:all .2s" onmouseover="this.style.borderColor='var(--primary)'" onmouseout="this.style.borderColor='var(--gray-light)'">
+          <div style="font-size:16px;margin-bottom:4px">📊</div>
+          <div>50/30/20</div>
+          <div style="color:var(--gray);font-size:10px">Classic Rule</div>
+        </button>
+      </div>
+
+      <div class="form-group">
+        <label>🏠 NEEDS — Kebutuhan Hidup (%)</label>
+        <input type="number" id="pctNeeds" min="0" max="100" value="50" oninput="updateBudgetPreview()">
+      </div>
+      <div class="form-group">
+        <label>💰 SAVINGS — Tabungan & Investasi (%)</label>
+        <input type="number" id="pctSavings" min="0" max="100" value="40" oninput="updateBudgetPreview()">
+      </div>
+      <div class="form-group">
+        <label>🎉 WANTS — Keinginan (%)</label>
+        <input type="number" id="pctWants" min="0" max="100" value="10" oninput="updateBudgetPreview()">
+      </div>
+
+      <div id="budgetPreview" style="background:#f8fafc;padding:14px;border-radius:10px;margin-bottom:16px"></div>
+
+      <button class="btn btn-primary btn-block" onclick="setupNext(2)">Selesai & Mulai! 🚀</button>
+      <button onclick="setupBack(1)" style="margin-top:8px;width:100%;background:none;border:none;color:var(--gray);cursor:pointer;font-size:13px;font-weight:600">← Kembali</button>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== APP SCREEN ==================== -->
+<div id="appScreen" style="display:none">
+<div class="app">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="header-left">
+      <h1>💎 FinPlan Pro</h1>
+      <p id="headerSub">Loading...</p>
+    </div>
+    <div class="header-right">
+      <div class="user-chip">
+        <span id="headerAvatar">👤</span>
+        <span id="headerName">User</span>
+      </div>
+      <button class="logout-btn" onclick="logout()">🚪 Logout</button>
+    </div>
+  </div>
+
+  <!-- NAV -->
+  <div class="nav">
+    <button class="nav-btn active" onclick="switchTab('dashboard',this)">📊 Dashboard</button>
+    <button class="nav-btn" onclick="switchTab('alokasi',this)">💰 Alokasi</button>
+    <button class="nav-btn" onclick="switchTab('budget',this)">📋 Budget Plan</button>
+    <button class="nav-btn" onclick="switchTab('utang',this)">💳 Utang</button>
+    <button class="nav-btn" onclick="switchTab('insights',this)">🧠 Insights</button>
+    <button class="nav-btn" onclick="switchTab('goals',this)">🎯 Goals</button>
+    <button class="nav-btn" onclick="switchTab('panduan',this)">📚 Panduan</button>
+    <button class="nav-btn" onclick="switchTab('ach',this)">🏆 Achievement</button>
+    <button class="nav-btn" onclick="switchTab('settings',this)">⚙️ Settings</button>
+  </div>
+
+  <!-- DASHBOARD -->
+  <div id="tab-dashboard" class="tab active">
+    <div class="tip-card">
+      <div style="font-size:11px;font-weight:700;opacity:.85;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">💡 TIP KEUANGAN</div>
+      <div style="font-size:15px;font-weight:600;line-height:1.6;margin-bottom:10px" id="dailyTip">Loading...</div>
+      <button onclick="changeTip()" style="background:rgba(255,255,255,.2);border:none;color:#fff;padding:7px 14px;border-radius:8px;font-weight:600;cursor:pointer;font-size:12px">Tip Lain</button>
+    </div>
+    <div class="stat-grid">
+      <div class="stat"><div class="stat-label">Total Saldo</div><div class="stat-value" id="sTotalBal" style="color:var(--primary)">Rp 0</div><div class="stat-sub">Semua waktu</div></div>
+      <div class="stat"><div class="stat-label">Pemasukan Bulan Ini</div><div class="stat-value" id="sMonthIn" style="color:var(--success)">Rp 0</div><div class="stat-sub" id="sMonthInSub">-</div></div>
+      <div class="stat"><div class="stat-label">Pengeluaran Bulan Ini</div><div class="stat-value" id="sMonthOut" style="color:var(--danger)">Rp 0</div><div class="stat-sub">Bulan ini</div></div>
+      <div class="stat"><div class="stat-label">💰 Sisa Bulan Ini</div><div class="stat-value" id="sMonthSisa" style="color:var(--warning)">Rp 0</div><div class="stat-sub">Siap dialokasikan!</div></div>
+    </div>
+    <div class="card">
+      <div class="card-title">➕ Tambah Transaksi</div>
+      <form id="txForm">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">
+          <button type="button" id="btnExp" onclick="setTxType('expense')" class="btn btn-danger">💸 Pengeluaran</button>
+          <button type="button" id="btnInc" onclick="setTxType('income')" class="btn btn-success" style="opacity:.5">💰 Pemasukan</button>
+        </div>
+        <div class="form-group"><label>Deskripsi</label><input type="text" id="txDesc" placeholder="Contoh: Belanja bulanan" required></div>
+        <div class="form-row">
+          <div class="form-group"><label>Jumlah (Rp)</label><input type="text" id="txAmt" placeholder="0" inputmode="numeric" required></div>
+          <div class="form-group"><label>Tanggal</label><input type="date" id="txDate" required></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>Kategori</label><select id="txCat"></select></div>
+          <div class="form-group" id="txOwnerGroup" style="display:none">
+            <label>👤 Pemilik Income</label>
+            <select id="txOwner">
+              <option value="saya">👤 Saya</option>
+              <option value="pasangan">👥 Pasangan</option>
+              <option value="lainnya">💼 Lainnya</option>
+            </select>
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary btn-block">✨ Tambah Transaksi</button>
+      </form>
+    </div>
+    <div class="period-wrap">
+      <button class="period-btn" onclick="setPeriod('today',this)">Hari Ini</button>
+      <button class="period-btn" onclick="setPeriod('week',this)">Minggu Ini</button>
+      <button class="period-btn active" onclick="setPeriod('month',this)">Bulan Ini</button>
+      <button class="period-btn" onclick="setPeriod('lastmonth',this)">Bulan Lalu</button>
+      <button class="period-btn" onclick="setPeriod('year',this)">Tahun Ini</button>
+      <button class="period-btn" onclick="setPeriod('all',this)">Semua</button>
+    </div>
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+        <div class="card-title" style="margin:0">📋 Riwayat Transaksi</div>
+        <button class="btn btn-primary btn-sm" onclick="exportCSV()">📥 Export</button>
+      </div>
+      <div id="txList"></div>
+    </div>
+  </div>
+
+  <!-- ALOKASI -->
+  <div id="tab-alokasi" class="tab">
+    <div class="hero" style="background:linear-gradient(135deg,#667eea,#764ba2)">
+      <div class="hero-label">💎 Total Net Worth</div>
+      <div class="hero-value" id="netWorth">Rp 0</div>
+      <div class="hero-sub">Total semua pos parkir uang</div>
+    </div>
+    <div class="card" style="background:linear-gradient(135deg,#10b981,#059669);color:#fff;border:none">
+      <div style="font-size:15px;font-weight:700;margin-bottom:12px">💰 Dana Sisa Bulan Ini — Siap Dialokasikan</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:14px">
+        <div><div style="font-size:11px;opacity:.85;margin-bottom:3px">💵 Pemasukan</div><div style="font-size:18px;font-weight:800;font-family:'JetBrains Mono',monospace" id="aIncome">Rp 0</div></div>
+        <div><div style="font-size:11px;opacity:.85;margin-bottom:3px">💸 Pengeluaran</div><div style="font-size:18px;font-weight:800;font-family:'JetBrains Mono',monospace" id="aExpense">Rp 0</div></div>
+        <div><div style="font-size:11px;opacity:.85;margin-bottom:3px">💰 SISA</div><div style="font-size:26px;font-weight:800;font-family:'JetBrains Mono',monospace" id="aSisa">Rp 0</div></div>
+      </div>
+      <!-- Income breakdown per sumber -->
+      <div id="aIncomeBreakdown" style="background:rgba(255,255,255,.15);border-radius:10px;padding:10px;margin-bottom:14px;font-size:12px"></div>
+      <button onclick="showAllocModal()" style="width:100%;padding:12px;background:rgba(255,255,255,.2);border:2px solid #fff;color:#fff;border-radius:10px;font-weight:700;cursor:pointer;font-size:14px">✨ Alokasikan Sisa Sekarang</button>
+    </div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+      <h2 style="color:#fff;font-size:17px;font-weight:700">📊 Pos Parkir Uang</h2>
+      <button class="btn btn-primary btn-sm" onclick="showAddPosModal()">+ Tambah Pos</button>
+    </div>
+    <div class="pos-grid" id="posGrid"></div>
+  </div>
+
+  <!-- BUDGET PLAN -->
+  <div id="tab-budget" class="tab">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:8px">
+      <h2 style="color:#fff;font-size:17px;font-weight:700">📋 Budget Plan Personal</h2>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+        <span style="background:rgba(255,255,255,.1);color:#94a3b8;padding:6px 12px;border-radius:8px;font-size:11px;font-weight:600">📅 Otomatis dari transaksi bulan ini</span>
+        <button class="btn btn-primary btn-sm" onclick="switchTab('settings',document.querySelectorAll('.nav-btn')[8])">⚙️ Edit Aturan</button>
+      </div>
+    </div>
+
+    <!-- Dynamic Income Cards (otomatis dari transaksi) -->
+    <div id="budgetIncomeCards" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:14px"></div>
+
+    <!-- Income Detail Breakdown per sumber/pemilik -->
+    <div class="card" style="margin-bottom:14px;border-left:4px solid var(--success)">
+      <div class="card-title" style="margin-bottom:10px">📊 Rincian Income Bulan Ini</div>
+      <div id="budgetIncomeDetail">
+        <div class="empty" style="padding:16px"><div class="empty-icon" style="font-size:28px">💰</div><p style="font-size:13px">Belum ada transaksi income bulan ini.<br>Tambah di tab Dashboard!</p></div>
+      </div>
+      <div style="margin-top:10px;padding-top:10px;border-top:1px dashed var(--gray-light);font-size:12px;color:var(--gray)">
+        💡 Budget Plan otomatis update setiap kali Anda input pemasukan baru.
+      </div>
+    </div>
+
+    <!-- Buckets — generated from posList -->
+    <div id="budgetBuckets"></div>
+
+    <!-- Progress goals -->
+    <h2 style="color:#fff;font-size:17px;font-weight:700;margin-bottom:12px">🎯 Progress Pos Savings</h2>
+    <div id="budgetGoals"></div>
+
+    <!-- Timeline -->
+    <div class="card"><div class="card-title">📅 Proyeksi Timeline</div><div id="timelineEl"></div></div>
+  </div>
+
+  <!-- UTANG -->
+  <div id="tab-utang" class="tab">
+    <div class="hero" style="background:linear-gradient(135deg,#ef4444,#dc2626)">
+      <div class="hero-label">💳 Total Sisa Utang</div>
+      <div class="hero-value" id="totalDebt">Rp 0</div>
+      <div class="hero-sub" id="debtSubtitle">Lunasi satu per satu! 💪</div>
+    </div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+      <h2 style="color:#fff;font-size:17px;font-weight:700">📋 Daftar Utang</h2>
+      <button class="btn btn-primary btn-sm" onclick="showAddDebtModal()">+ Tambah Utang</button>
+    </div>
+    <div id="debtList"></div>
+  </div>
+
+  <!-- INSIGHTS -->
+  <div id="tab-insights" class="tab">
+    <div class="hero" style="background:linear-gradient(135deg,#667eea,#764ba2)">
+      <div class="hero-label">Financial Health Score</div>
+      <div class="hero-value" id="healthScore">-</div>
+      <div class="hero-sub" id="healthDesc">Menganalisa...</div>
+    </div>
+    <h2 style="color:#fff;font-size:17px;font-weight:700;margin-bottom:12px">🧠 Smart Insights</h2>
+    <div id="insightList"></div>
+  </div>
+
+  <!-- GOALS -->
+  <div id="tab-goals" class="tab">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+      <h2 style="color:#fff;font-size:17px;font-weight:700">🎯 Financial Goals</h2>
+      <button class="btn btn-primary btn-sm" onclick="showAddGoalModal()">+ Tambah Goal</button>
+    </div>
+    <div id="goalList"></div>
+  </div>
+
+  <!-- PANDUAN -->
+  <div id="tab-panduan" class="tab">
+    <h2 style="color:#fff;font-size:17px;font-weight:700;margin-bottom:12px">📚 Panduan Keuangan</h2>
+    <div class="article-grid" id="articleGrid"></div>
+  </div>
+
+  <!-- ACHIEVEMENT -->
+  <div id="tab-ach" class="tab">
+    <div class="card" style="text-align:center;background:linear-gradient(135deg,#667eea,#764ba2);color:#fff">
+      <div style="font-size:36px;margin-bottom:8px">🏆</div>
+      <div style="font-size:26px;font-weight:800" id="achCount">0/0</div>
+      <div style="opacity:.85;font-size:13px">Achievements Unlocked</div>
+    </div>
+    <div class="ach-grid" id="achGrid"></div>
+  </div>
+
+  <!-- SETTINGS -->
+  <div id="tab-settings" class="tab">
+    <h2 style="color:#fff;font-size:17px;font-weight:700;margin-bottom:14px">⚙️ Pengaturan</h2>
+
+    <!-- Budget Rule -->
+    <div class="card" style="margin-bottom:14px">
+      <div class="card-title">📊 Aturan Budget</div>
+      <div style="background:#eff6ff;padding:12px;border-radius:10px;margin-bottom:14px;font-size:13px;color:var(--primary);font-weight:600">
+        💡 Total harus 100%. Semua pos Alokasi akan otomatis masuk bucket sesuai kategorinya.
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px">
+        <button onclick="applyBudgetTemplateSettings(50,40,10)" class="btn btn-sm btn-primary">⭐ 50/40/10</button>
+        <button onclick="applyBudgetTemplateSettings(50,30,20)" class="btn btn-sm btn-ghost">📊 50/30/20</button>
+      </div>
+      <div class="form-group">
+        <label>🏠 NEEDS — Kebutuhan (%)</label>
+        <input type="number" id="settingNeeds" min="0" max="100" oninput="updateSettingPreview()">
+      </div>
+      <div class="form-group">
+        <label>💰 SAVINGS — Tabungan & Investasi (%)</label>
+        <input type="number" id="settingSavings" min="0" max="100" oninput="updateSettingPreview()">
+      </div>
+      <div class="form-group">
+        <label>🎉 WANTS — Keinginan (%)</label>
+        <input type="number" id="settingWants" min="0" max="100" oninput="updateSettingPreview()">
+      </div>
+      <div id="settingPreview" style="background:#f8fafc;padding:12px;border-radius:10px;margin-bottom:14px;font-size:13px"></div>
+      <button onclick="saveBudgetSettings()" class="btn btn-primary btn-block">💾 Simpan Aturan Budget</button>
+    </div>
+
+    <!-- Edit Income -->
+    <div class="card" style="margin-bottom:14px">
+      <div class="card-title">💰 Edit Income</div>
+      <div class="form-group"><label>👤 Income Saya (Rp/bulan)</label><input type="text" id="sIncome1" inputmode="numeric"></div>
+      <div class="form-group"><label>👥 Income Pasangan (Rp/bulan)</label><input type="text" id="sIncome2" inputmode="numeric"></div>
+      <button onclick="saveIncome()" class="btn btn-primary btn-block">💾 Simpan Income</button>
+    </div>
+
+    <!-- Danger Zone -->
+    <div class="card" style="border:2px solid #fee2e2">
+      <div class="card-title" style="color:var(--danger)">⚠️ Danger Zone</div>
+      <button onclick="resetUserData()" class="btn btn-danger btn-block">🗑️ Reset Semua Data Akun Ini</button>
+      <p style="font-size:12px;color:var(--gray);margin-top:8px;text-align:center">Tindakan ini tidak dapat dibatalkan!</p>
+    </div>
+  </div>
+
+</div><!-- end .app -->
+</div><!-- end appScreen -->
+
+<!-- ==================== MODALS ==================== -->
+
+<!-- Allocate Modal -->
+<div id="mAlloc" class="modal">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeModal('mAlloc')">✕</button>
+    <div class="modal-title">💰 Alokasikan Dana Sisa</div>
+    <div style="background:#f0fdf4;padding:12px;border-radius:10px;margin-bottom:16px;border-left:4px solid var(--success)">
+      <div style="font-size:11px;color:var(--gray);margin-bottom:3px">Dana Sisa Tersedia:</div>
+      <div style="font-size:26px;font-weight:800;font-family:'JetBrains Mono',monospace;color:var(--success)" id="mAllocSisa">Rp 0</div>
+    </div>
+    <form id="allocForm">
+      <div id="allocInputs"></div>
+      <div style="background:#f8fafc;padding:12px;border-radius:10px;margin-bottom:14px">
+        <div style="display:flex;justify-content:space-between;font-weight:700;margin-bottom:5px;font-size:13px">
+          <span>Total Dialokasikan:</span><span id="allocTotal" style="font-family:'JetBrains Mono',monospace">Rp 0</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-weight:700;color:var(--primary);font-size:13px">
+          <span>Belum Dialokasikan:</span><span id="allocRemain" style="font-family:'JetBrains Mono',monospace">Rp 0</span>
+        </div>
+      </div>
+      <button type="submit" class="btn btn-primary btn-block">✅ Simpan Alokasi</button>
+    </form>
+  </div>
+</div>
+
+<!-- Add Pos Modal -->
+<div id="mAddPos" class="modal">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeModal('mAddPos')">✕</button>
+    <div class="modal-title">💳 Tambah Pos Parkir Uang</div>
+
+    <!-- Template Picker -->
+    <div style="margin-bottom:16px">
+      <div style="font-size:13px;font-weight:600;margin-bottom:8px;color:var(--gray)">⚡ Template Cepat:</div>
+      <div class="template-grid" id="templateGrid"></div>
+    </div>
+
+    <div style="font-size:13px;font-weight:600;color:var(--gray);margin-bottom:10px">— atau custom sendiri —</div>
+
+    <form id="addPosForm">
+      <div class="form-group">
+        <label>Nama Pos</label>
+        <input type="text" id="posName" placeholder="Contoh: Dana Darurat, DP Rumah, Reksadana" required>
+      </div>
+
+      <!-- Emoji Picker -->
+      <div class="form-group">
+        <label>Pilih Icon</label>
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+          <div id="posIconPreview" style="font-size:32px;width:48px;height:48px;background:#f8fafc;border-radius:10px;display:flex;align-items:center;justify-content:center;border:2px solid var(--gray-light)">💰</div>
+          <input type="text" id="posIcon" placeholder="💰" style="width:80px;font-size:20px;text-align:center" oninput="document.getElementById('posIconPreview').textContent=this.value||'💰'">
+        </div>
+        <!-- Emoji categories -->
+        <div style="background:#f8fafc;border-radius:12px;padding:12px">
+          <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px" id="emojiCatBtns"></div>
+          <div style="display:flex;flex-wrap:wrap;gap:6px" id="emojiGrid"></div>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Kategori Budget</label>
+          <select id="posCategory">
+            <option value="needs">🏠 Needs (Kebutuhan)</option>
+            <option value="savings" selected>💰 Savings (Tabungan)</option>
+            <option value="wants">🎉 Wants (Keinginan)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Target (Rp) — Opsional</label>
+          <input type="text" id="posTarget" placeholder="0" inputmode="numeric">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Saldo Awal (Rp)</label>
+        <input type="text" id="posBalance" placeholder="0" value="0" inputmode="numeric">
+      </div>
+
+      <!-- Platform/Lokasi -->
+      <div class="form-group">
+        <label>🏦 Platform / Lokasi Simpan <span style="color:var(--gray);font-weight:400">(opsional)</span></label>
+        <div style="display:flex;flex-wrap:wrap;gap:7px;margin-bottom:8px" id="platformSuggestions"></div>
+        <input type="text" id="posPlatform" placeholder="Contoh: BCA Tabungan, Bibit, Pluang, OVO, dll">
+      </div>
+
+      <!-- Catatan -->
+      <div class="form-group">
+        <label>📝 Catatan <span style="color:var(--gray);font-weight:400">(opsional)</span></label>
+        <textarea id="posNotes" rows="2" placeholder="Contoh: Dana ini khusus untuk keadaan darurat, jangan disentuh kecuali mendesak!" style="resize:vertical"></textarea>
+      </div>
+
+      <button type="submit" class="btn btn-primary btn-block">✨ Tambah Pos</button>
+    </form>
+  </div>
+</div>
+
+<!-- Edit Pos Modal -->
+<div id="mEditPos" class="modal">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeModal('mEditPos')">✕</button>
+    <div class="modal-title">✏️ Edit Pos Parkir Uang</div>
+    <form id="editPosForm">
+      <input type="hidden" id="editPosId">
+      <div class="form-group">
+        <label>Nama Pos</label>
+        <input type="text" id="editPosName" required>
+      </div>
+      <div class="form-group">
+        <label>Icon</label>
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+          <div id="editPosIconPreview" style="font-size:32px;width:48px;height:48px;background:#f8fafc;border-radius:10px;display:flex;align-items:center;justify-content:center;border:2px solid var(--gray-light)">💰</div>
+          <input type="text" id="editPosIcon" style="width:80px;font-size:20px;text-align:center" oninput="document.getElementById('editPosIconPreview').textContent=this.value||'💰'">
+        </div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px" id="editEmojiGrid"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Kategori</label>
+          <select id="editPosCategory">
+            <option value="needs">🏠 Needs</option>
+            <option value="savings">💰 Savings</option>
+            <option value="wants">🎉 Wants</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Target (Rp)</label>
+          <input type="text" id="editPosTarget" inputmode="numeric">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Saldo Terkini (Rp)</label>
+        <input type="text" id="editPosBalance" inputmode="numeric" required>
+      </div>
+      <div class="form-group">
+        <label>🏦 Platform / Lokasi Simpan</label>
+        <div style="display:flex;flex-wrap:wrap;gap:7px;margin-bottom:8px" id="editPlatformSuggestions"></div>
+        <input type="text" id="editPosPlatform" placeholder="BCA, Bibit, Pluang, OVO, dll">
+      </div>
+      <div class="form-group">
+        <label>📝 Catatan</label>
+        <textarea id="editPosNotes" rows="2" style="resize:vertical" placeholder="Catatan khusus untuk pos ini..."></textarea>
+      </div>
+      <button type="submit" class="btn btn-primary btn-block">💾 Simpan Perubahan</button>
+    </form>
+  </div>
+</div>
+
+<!-- Add Debt Modal -->
+<div id="mAddDebt" class="modal">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeModal('mAddDebt')">✕</button>
+    <div class="modal-title">💳 Tambah Catatan Utang</div>
+    <form id="addDebtForm">
+      <div class="form-group"><label>Nama Utang</label><input type="text" id="dName" placeholder="Contoh: KPR, Pinjam Teman, Cicilan HP" required></div>
+      <div class="form-row">
+        <div class="form-group"><label>Total Utang (Rp)</label><input type="text" id="dTotal" placeholder="0" inputmode="numeric" required></div>
+        <div class="form-group"><label>Sudah Dibayar (Rp)</label><input type="text" id="dPaid" placeholder="0" inputmode="numeric" value="0"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Cicilan/Bulan (Rp)</label><input type="text" id="dMonthly" placeholder="0" inputmode="numeric"></div>
+        <div class="form-group"><label>Keterangan / Jatuh Tempo</label><input type="text" id="dNote" placeholder="Lunas Maret 2026"></div>
+      </div>
+      <button type="submit" class="btn btn-primary btn-block">✨ Simpan Utang</button>
+    </form>
+  </div>
+</div>
+
+<!-- Pay Debt Modal -->
+<div id="mPayDebt" class="modal">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeModal('mPayDebt')">✕</button>
+    <div class="modal-title">💳 Bayar / Update Utang</div>
+    <form id="payDebtForm">
+      <input type="hidden" id="payDebtId">
+      <div style="background:#fffbeb;padding:12px;border-radius:10px;margin-bottom:14px;border-left:4px solid var(--warning)">
+        <div style="font-size:14px;font-weight:700" id="payDebtName">-</div>
+        <div style="font-size:12px;color:var(--gray);margin-top:3px" id="payDebtInfo">-</div>
+      </div>
+      <div class="form-group"><label>Jumlah Pembayaran (Rp)</label><input type="text" id="payAmt" placeholder="0" inputmode="numeric" required></div>
+      <button type="submit" class="btn btn-primary btn-block">✅ Catat Pembayaran</button>
+    </form>
+  </div>
+</div>
+
+<!-- Add Goal Modal -->
+<div id="mAddGoal" class="modal">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeModal('mAddGoal')">✕</button>
+    <div class="modal-title">🎯 Tambah Financial Goal</div>
+    <form id="addGoalForm">
+      <div class="form-group"><label>Nama Goal</label><input type="text" id="gName" placeholder="DP Rumah, Dana Pendidikan, dll" required></div>
+      <div class="form-row">
+        <div class="form-group"><label>Target (Rp)</label><input type="text" id="gTarget" placeholder="0" inputmode="numeric" required></div>
+        <div class="form-group"><label>Deadline</label><input type="date" id="gDeadline" required></div>
+      </div>
+      <div class="form-group">
+        <label>Hubungkan ke Pos Alokasi</label>
+        <select id="gLinkedPos"><option value="">-- Tidak dihubungkan --</option></select>
+      </div>
+      <button type="submit" class="btn btn-primary btn-block">✨ Buat Goal</button>
+    </form>
+  </div>
+</div>
+
+<!-- Create User Modal (from login) -->
+<div id="mCreateUser" class="modal">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeModal('mCreateUser')">✕</button>
+    <div class="modal-title">✨ Buat Akun Baru</div>
+    <p style="color:var(--gray);font-size:13px;margin-bottom:16px">Setelah membuat akun, Anda akan melalui setup wizard untuk konfigurasi keuangan.</p>
+    <div class="form-group"><label>Nama / Panggilan</label><input type="text" id="cuName" placeholder="Contoh: Big Bos, Keluarga Budi"></div>
+    <div class="form-group">
+      <label>Avatar</label>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:6px" id="cuAvatarPicker"></div>
+    </div>
+    <div class="form-group"><label>PIN 4 Digit</label><input type="password" id="cuPin" maxlength="4" placeholder="****" inputmode="numeric" style="letter-spacing:8px;font-size:20px;text-align:center"></div>
+    <button onclick="createUserFromModal()" class="btn btn-primary btn-block">🚀 Buat Akun & Mulai Setup</button>
+  </div>
+</div>
+
+<!-- Article Modal -->
+<div id="mArticle" class="modal">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeModal('mArticle')">✕</button>
+    <div class="modal-title" id="artTitle"></div>
+    <div id="artBody" style="line-height:1.8;color:var(--gray);font-size:14px"></div>
+  </div>
+</div>
+
+<script>
+// ✅ SERVICE WORKER ENABLED - PWA Ready!
+if('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/service-worker.js')
+    .then(reg => console.log('✅ Service Worker registered:', reg.scope))
+    .catch(err => console.error('❌ Service Worker failed:', err));
+}
+
+// ==================== GLOBAL STATE ====================
+let currentUser = null; // { id, name, avatar, pin, budgetRule:{needs,savings,wants}, income:{i1,i2} }
+let D = { transactions:[], posList:[], debts:[], goals:[], achievements:[] };
+let txType = 'expense';
+let period = 'month';
+let pinBuffer = '';
+let pendingUserId = null;
+
+const AVATARS = ['👨‍👩‍👧‍👦','👨‍💼','👩‍💼','🧑‍💻','👨‍🍳','🧑‍🎨','💎','🦁','🐯','🦊','🚀','⭐','🎯','💪','🌟'];
+
+// ==================== STORAGE HELPERS ====================
+function getAllUsers() { return JSON.parse(localStorage.getItem('fp_users')||'[]'); }
+function saveAllUsers(u) { localStorage.setItem('fp_users',JSON.stringify(u)); }
+function getUserData(uid) { return JSON.parse(localStorage.getItem(`fp_data_${uid}`)||'{"transactions":[],"posList":[],"debts":[],"goals":[],"achievements":[]}'); }
+function saveUserData(uid, data) { localStorage.setItem(`fp_data_${uid}`,JSON.stringify(data)); }
+
+// ==================== UTILS ====================
+function fmt(n){ 
+  const num = Math.round(n || 0);
+  const abs = Math.abs(num);
+  const formatted = 'Rp ' + abs.toLocaleString('id-ID');
+  return num < 0 ? '-' + formatted : formatted;
+}
+function fmtI(v){ return String(v).replace(/\D/g,'').replace(/\B(?=(\d{3})+(?!\d))/g,'.'); }
+function parseRp(v){ return parseInt(String(v).replace(/\./g,'').replace(/\D/g,''))||0; }
+
+function setupRp(id){
+  const el = document.getElementById(id);
+  if(!el) return;
+  el.addEventListener('input',function(){
+    const p=this.selectionStart, ol=this.value.length;
+    this.value=fmtI(this.value);
+    const diff=this.value.length-ol;
+    try{this.setSelectionRange(p+diff,p+diff);}catch(e){}
+  });
+}
+
+function getMonthTotals(){
+  const now=new Date();
+  const monthly=D.transactions.filter(t=>{
+    const d=new Date(t.date);
+    return d.getMonth()===now.getMonth()&&d.getFullYear()===now.getFullYear();
+  });
+  const income=monthly.filter(t=>t.type==='income').reduce((s,t)=>s+t.amount,0);
+  const expense=monthly.filter(t=>t.type==='expense').reduce((s,t)=>s+t.amount,0);
+  
+  // 💰 DANA SISA = INCOME - EXPENSE (SIMPLE!)
+  const sisa = income - expense;
+  
+  return {income, expense, sisa};
+}
+
+// Dynamic income breakdown by owner & category
+function getDynamicIncome(){
+  const now=new Date();
+  const incomeThisMonth=D.transactions.filter(t=>{
+    const d=new Date(t.date);
+    return t.type==='income'&&d.getMonth()===now.getMonth()&&d.getFullYear()===now.getFullYear();
+  });
+
+  // Group by owner
+  const byOwner={saya:0,pasangan:0,lainnya:0};
+  const byCategory={};
+  const ownerDetails={saya:[],pasangan:[],lainnya:[]};
+
+  incomeThisMonth.forEach(t=>{
+    const owner=t.owner||'saya';
+    byOwner[owner]=(byOwner[owner]||0)+t.amount;
+    byCategory[t.category]=(byCategory[t.category]||0)+t.amount;
+    if(!ownerDetails[owner]) ownerDetails[owner]=[];
+    ownerDetails[owner].push(t);
+  });
+
+  const total=incomeThisMonth.reduce((s,t)=>s+t.amount,0);
+  return {total,byOwner,byCategory,ownerDetails,transactions:incomeThisMonth};
+}
+
+function getFilteredTx(){
+  const now=new Date();
+  return D.transactions.filter(t=>{
+    const d=new Date(t.date);
+    if(period==='today') return d.toDateString()===now.toDateString();
+    if(period==='week') return (now-d)<=7*86400000;
+    if(period==='month') return d.getMonth()===now.getMonth()&&d.getFullYear()===now.getFullYear();
+    if(period==='lastmonth'){const lm=new Date(now.getFullYear(),now.getMonth()-1,1),lme=new Date(now.getFullYear(),now.getMonth(),0);return d>=lm&&d<=lme;}
+    if(period==='year') return d.getFullYear()===now.getFullYear();
+    return true;
+  });
+}
+
+function saveD(){ saveUserData(currentUser.id, D); }
+
+// ==================== LOGIN SYSTEM ====================
+function showLoginScreen(){
+  hide(['pinScreen','setupScreen','appScreen']);
+  show('loginScreen');
+  renderUserList();
+}
+
+function renderUserList(){
+  const users = getAllUsers();
+  const container = document.getElementById('userList');
+  if(!users.length){
+    container.innerHTML = `<div style="text-align:center;padding:20px;color:var(--gray)"><div style="font-size:36px;opacity:.3;margin-bottom:8px">👤</div><p style="font-size:13px">Belum ada akun. Buat akun pertama Anda!</p></div>`;
+    return;
+  }
+  const colors = ['#2563eb','#10b981','#f59e0b','#8b5cf6','#ef4444','#14b8a6'];
+  container.innerHTML = users.map((u,i)=>`
+    <div class="user-card" onclick="selectUser(${u.id})">
+      <div class="user-avatar" style="background:${colors[i%colors.length]}">${u.avatar||u.name.charAt(0).toUpperCase()}</div>
+      <div>
+        <div class="user-info-name">${u.name}</div>
+        <div class="user-info-sub">Klik untuk masuk</div>
+      </div>
+      <div style="margin-left:auto;color:var(--gray);font-size:18px">›</div>
+    </div>`).join('');
+}
+
+function selectUser(uid){
+  const users = getAllUsers();
+  const user = users.find(u=>u.id===uid);
+  if(!user) return;
+  pendingUserId = uid;
+  document.getElementById('pinUserName').textContent = user.name;
+  document.getElementById('pinUserAvatar').textContent = user.avatar||'👤';
+  pinBuffer = '';
+  updatePinDots();
+  document.getElementById('pinError').textContent = '';
+  hide(['loginScreen']); show('pinScreen');
+  document.getElementById('pinScreen').style.display = 'flex';
+}
+
+function pinKey(k){
+  if(pinBuffer.length >= 4) return;
+  pinBuffer += k;
+  updatePinDots();
+  if(pinBuffer.length === 4) setTimeout(checkPin, 200);
+}
+
+function pinDel(){
+  pinBuffer = pinBuffer.slice(0,-1);
+  updatePinDots();
+}
+
+function updatePinDots(){
+  for(let i=0;i<4;i++){
+    const d = document.getElementById('dot'+i);
+    if(d) d.className = 'pin-dot'+(i<pinBuffer.length?' filled':'');
+  }
+}
+
+function checkPin(){
+  const users = getAllUsers();
+  const user = users.find(u=>u.id===pendingUserId);
+  if(user && pinBuffer === user.pin){
+    loginUser(user);
+  } else {
+    document.getElementById('pinError').textContent = '❌ PIN salah! Coba lagi.';
+    pinBuffer = '';
+    updatePinDots();
+  }
+}
+
+function loginUser(user){
+  currentUser = user;
+  D = getUserData(user.id);
+  if(!D.achievements||!D.achievements.length) D.achievements = initAch();
+  hide(['loginScreen','pinScreen','setupScreen']);
+  document.getElementById('appScreen').style.display = 'block';
+  document.getElementById('headerName').textContent = user.name;
+  document.getElementById('headerAvatar').textContent = user.avatar||'👤';
+  updateHeader();
+  renderDashboard();
+  loadSettingsTab();
+  showTip();
+}
+
+function logout(){
+  if(!confirm('Logout dari akun ini?')) return;
+  currentUser = null; D = {};
+  document.getElementById('appScreen').style.display = 'none';
+  showLoginScreen();
+}
+
+function backToLogin(){ pinBuffer=''; hide(['pinScreen']); showLoginScreen(); }
+
+function showCreateUser(){
+  // Build avatar picker in modal
+  const pick = document.getElementById('cuAvatarPicker');
+  if(pick){
+    pick.innerHTML = AVATARS.map(a=>`<span onclick="selectCuAvatar(this,'${a}')" style="font-size:24px;cursor:pointer;padding:4px;border-radius:8px;border:2px solid transparent;transition:all .2s" onmouseover="this.style.borderColor='var(--primary)'" onmouseout="this.style.borderColor=this.dataset.sel?'var(--primary)':'transparent'">${a}</span>`).join('');
+  }
+  showModal('mCreateUser');
+}
+
+let cuSelectedAvatar = '👨‍💼';
+function selectCuAvatar(el,a){
+  cuSelectedAvatar = a;
+  document.querySelectorAll('#cuAvatarPicker span').forEach(s=>{s.style.borderColor='transparent';delete s.dataset.sel;});
+  el.style.borderColor = 'var(--primary)'; el.dataset.sel = '1';
+}
+
+function createUserFromModal(){
+  const name = document.getElementById('cuName').value.trim();
+  const pin  = document.getElementById('cuPin').value.trim();
+  if(!name){ alert('Masukkan nama terlebih dahulu!'); return; }
+  if(pin.length !== 4 || !/^\d{4}$/.test(pin)){ alert('PIN harus 4 digit angka!'); return; }
+  const users = getAllUsers();
+  const newUser = { id: Date.now(), name, avatar: cuSelectedAvatar, pin };
+  users.push(newUser);
+  saveAllUsers(users);
+  closeModal('mCreateUser');
+  // Go to setup wizard
+  currentUser = newUser;
+  runSetupWizard();
+}
+
+// ==================== SETUP WIZARD ====================
+let setupStep = 0;
+function runSetupWizard(){
+  hide(['loginScreen','pinScreen','appScreen']);
+  document.getElementById('setupScreen').style.display = 'flex';
+  showSetupStep(0);
+}
+
+function showSetupStep(s){
+  setupStep = s;
+  [0,1,2].forEach(i=>{
+    document.getElementById('step'+i).style.display = i===s?'block':'none';
+    const dot = document.getElementById('sd'+i);
+    if(dot) dot.className = 'step-dot'+(i===s?' active':i<s?' done':'');
+  });
+  if(s===2) updateBudgetPreview();
+}
+
+function setupNext(s){
+  if(s===0){
+    const name = document.getElementById('newName').value.trim();
+    const pin  = document.getElementById('newPin').value.trim();
+    if(!name){ alert('Nama harus diisi!'); return; }
+    if(pin.length!==4||!/^\d{4}$/.test(pin)){ alert('PIN harus 4 digit angka!'); return; }
+    // Update user
+    const users = getAllUsers();
+    const idx = users.findIndex(u=>u.id===currentUser.id);
+    if(idx>=0){
+      users[idx].name = name;
+      users[idx].pin  = pin;
+      currentUser = users[idx];
+      saveAllUsers(users);
+    }
+    showSetupStep(1);
+  } else if(s===1){
+    const i1 = parseRp(document.getElementById('newIncome1').value);
+    const i2 = parseRp(document.getElementById('newIncome2').value);
+    if(!i1){ alert('Income harus diisi!'); return; }
+    currentUser.income = {i1,i2};
+    const users = getAllUsers();
+    const idx = users.findIndex(u=>u.id===currentUser.id);
+    if(idx>=0){ users[idx].income = {i1,i2}; saveAllUsers(users); }
+    showSetupStep(2);
+  } else if(s===2){
+    const n = parseInt(document.getElementById('pctNeeds').value)||0;
+    const sv= parseInt(document.getElementById('pctSavings').value)||0;
+    const w = parseInt(document.getElementById('pctWants').value)||0;
+    if(n+sv+w!==100){ alert('Total harus 100%! Sekarang: '+(n+sv+w)+'%'); return; }
+    currentUser.budgetRule = {needs:n,savings:sv,wants:w};
+    const users = getAllUsers();
+    const idx = users.findIndex(u=>u.id===currentUser.id);
+    if(idx>=0){ users[idx].budgetRule={needs:n,savings:sv,wants:w}; saveAllUsers(users); }
+    // Initialize data
+    D = { transactions:[], posList:[], debts:[], goals:[], achievements:initAch() };
+    saveD();
+    loginUser(currentUser);
+  }
+}
+
+function setupBack(to){ showSetupStep(to); }
+
+function applyBudgetTemplate(n,s,w){
+  document.getElementById('pctNeeds').value=n;
+  document.getElementById('pctSavings').value=s;
+  document.getElementById('pctWants').value=w;
+  updateBudgetPreview();
+}
+
+function updateBudgetPreview(){
+  const inc = parseRp(document.getElementById('newIncome1')?.value||'0') + parseRp(document.getElementById('newIncome2')?.value||'0');
+  const n=parseInt(document.getElementById('pctNeeds')?.value)||0;
+  const s=parseInt(document.getElementById('pctSavings')?.value)||0;
+  const w=parseInt(document.getElementById('pctWants')?.value)||0;
+  const total=n+s+w;
+  const el=document.getElementById('budgetPreview');
+  if(!el) return;
+  const color = total===100?'var(--success)':'var(--danger)';
+  el.innerHTML=`
+    <div style="display:flex;justify-content:space-between;margin-bottom:6px;font-size:13px">
+      <span>🏠 Needs ${n}%</span><span style="font-weight:700">${fmt(inc*n/100)}</span>
+    </div>
+    <div style="display:flex;justify-content:space-between;margin-bottom:6px;font-size:13px">
+      <span>💰 Savings ${s}%</span><span style="font-weight:700">${fmt(inc*s/100)}</span>
+    </div>
+    <div style="display:flex;justify-content:space-between;margin-bottom:10px;font-size:13px">
+      <span>🎉 Wants ${w}%</span><span style="font-weight:700">${fmt(inc*w/100)}</span>
+    </div>
+    <div style="display:flex;justify-content:space-between;font-weight:800;font-size:14px;color:${color}">
+      <span>Total</span><span>${total}% ${total===100?'✅':'❌'}</span>
+    </div>`;
+}
+
+// Income preview in setup
+['newIncome1','newIncome2'].forEach(id=>{
+  const el=document.getElementById(id);
+  if(el){
+    el.addEventListener('input',()=>{
+      setupRp(id);
+      const i1=parseRp(document.getElementById('newIncome1').value);
+      const i2=parseRp(document.getElementById('newIncome2').value);
+      const prev=document.getElementById('incomePreviewSetup');
+      if(prev) prev.textContent=fmt(i1+i2);
+      updateBudgetPreview();
+    });
+  }
+});
+
+// ==================== TAB SWITCHING ====================
+function show(id){ const el=document.getElementById(id); if(el) el.style.display='flex'; }
+function hide(ids){ ids.forEach(id=>{ const el=document.getElementById(id); if(el) el.style.display='none'; }); }
+function showModal(id){ document.getElementById(id).classList.add('active'); }
+function closeModal(id){ document.getElementById(id).classList.remove('active'); }
+window.onclick = e=>{ if(e.target.classList.contains('modal')) e.target.classList.remove('active'); };
+
+function switchTab(name,btn){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+  if(btn) btn.classList.add('active');
+  if(name==='dashboard') renderDashboard();
+  if(name==='alokasi') renderAlokasi();
+  if(name==='budget') renderBudget();
+  if(name==='utang') renderDebts();
+  if(name==='insights') renderInsights();
+  if(name==='goals') renderGoals();
+  if(name==='panduan') renderArticles();
+  if(name==='ach') renderAch();
+  if(name==='settings') loadSettingsTab();
+}
+
+// ==================== DASHBOARD ====================
+function renderDashboard(){
+  const all = D.transactions;
+  const totalIn  = all.filter(t=>t.type==='income').reduce((s,t)=>s+t.amount,0);
+  const totalOut = all.filter(t=>t.type==='expense').reduce((s,t)=>s+t.amount,0);
+  const m = getMonthTotals();
+  document.getElementById('sTotalBal').textContent = fmt(totalIn-totalOut);
+  document.getElementById('sMonthIn').textContent  = fmt(m.income);
+  document.getElementById('sMonthOut').textContent = fmt(m.expense);
+  document.getElementById('sMonthSisa').textContent= fmt(m.sisa);
+  document.getElementById('sMonthSisa').style.color= m.sisa>=0?'var(--success)':'var(--danger)';
+
+  const filtered = getFilteredTx();
+  const list = document.getElementById('txList');
+  if(!filtered.length){
+    list.innerHTML=`<div class="empty"><div class="empty-icon">📊</div><p>Tidak ada transaksi untuk periode ini</p></div>`;
+    return;
+  }
+  list.innerHTML = filtered.map(t=>`
+    <div class="tx-item ${t.type}">
+      <div style="flex:1">
+        <div class="tx-name">${t.description}</div>
+        <div class="tx-meta"><span>${t.category}</span><span>${new Date(t.date).toLocaleDateString('id-ID',{day:'2-digit',month:'short',year:'numeric'})}</span></div>
+      </div>
+      <div class="tx-amount ${t.type}">${t.type==='income'?'+':'-'} ${fmt(t.amount)}</div>
+      <button class="del-btn" onclick="deleteTx(${t.id})">🗑️</button>
+    </div>`).join('');
+}
+
+function setTxType(type){
+  txType=type;
+  document.getElementById('btnExp').style.opacity=type==='expense'?'1':'.5';
+  document.getElementById('btnInc').style.opacity=type==='income'?'1':'.5';
+  // Show owner field only for income
+  const ownerGroup=document.getElementById('txOwnerGroup');
+  if(ownerGroup) ownerGroup.style.display=type==='income'?'block':'none';
+  updateTxCats();
+}
+
+function updateTxCats(){
+  const cats = txType==='expense'
+    ?['🍔 Makanan & Minuman','🚗 Transportasi','🛍️ Belanja','💡 Tagihan','🎬 Hiburan','🏥 Kesehatan','📚 Pendidikan','🏠 Rumah Tangga','💳 Cicilan Utang','📌 Lainnya']
+    :['💼 Gaji','🎁 Bonus','📈 Return Investasi','💻 Freelance','🚗 Hasil Usaha','💡 Passive Income','💰 Lainnya'];
+  document.getElementById('txCat').innerHTML=cats.map(c=>`<option>${c}</option>`).join('');
+}
+
+document.getElementById('txForm').addEventListener('submit',e=>{
+  e.preventDefault();
+  const type=txType;
+  const owner=type==='income'?(document.getElementById('txOwner')?.value||'saya'):'';
+  const t={
+    id:Date.now(),type,
+    description:document.getElementById('txDesc').value,
+    amount:parseRp(document.getElementById('txAmt').value),
+    category:document.getElementById('txCat').value,
+    date:document.getElementById('txDate').value,
+    owner  // 'saya' | 'pasangan' | 'lainnya' | ''
+  };
+  if(!t.amount){alert('Jumlah harus diisi!');return;}
+  D.transactions.unshift(t);
+  saveD(); renderDashboard(); checkAch(); updateHeader();
+  // Jika income, refresh budget plan jika sedang aktif
+  const budgetTab=document.getElementById('tab-budget');
+  if(budgetTab&&budgetTab.classList.contains('active')) renderBudget();
+  e.target.reset();
+  document.getElementById('txDate').valueAsDate=new Date();
+  setTxType('expense');
+});
+
+function deleteTx(id){ if(!confirm('Hapus?')) return; D.transactions=D.transactions.filter(t=>t.id!==id); saveD(); renderDashboard(); }
+
+function setPeriod(p,btn){ period=p; document.querySelectorAll('.period-btn').forEach(b=>b.classList.remove('active')); if(btn) btn.classList.add('active'); renderDashboard(); }
+
+function exportCSV(){
+  const f=getFilteredTx();
+  if(!f.length){alert('Tidak ada data!');return;}
+  let csv='Tanggal,Deskripsi,Kategori,Tipe,Jumlah\n';
+  f.forEach(t=>{csv+=`${t.date},"${t.description}","${t.category}",${t.type},${t.amount}\n`;});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
+  a.download=`transaksi-${currentUser?.name||'user'}-${Date.now()}.csv`;
+  a.click();
+}
+
+// ==================== ALOKASI ====================
+function renderAlokasi(){
+  const m=getMonthTotals();
+  const inc=getDynamicIncome();
+  document.getElementById('aIncome').textContent=fmt(m.income);
+  document.getElementById('aExpense').textContent=fmt(m.expense);
+  
+  // 🔥 DANA SISA dengan color indicator
+  const sisaEl = document.getElementById('aSisa');
+  sisaEl.textContent = fmt(m.sisa);
+  sisaEl.style.color = m.sisa < 0 ? '#ef4444' : '#fff'; // Red if negative
+
+  // Income breakdown per pemilik
+  const bd=document.getElementById('aIncomeBreakdown');
+  if(bd){
+    if(!inc.total){
+      bd.innerHTML='<span style="opacity:.8">Belum ada income bulan ini · Tambah di Dashboard!</span>';
+    } else {
+      const ownerLabels={saya:'👤 Saya',pasangan:'👥 Pasangan',lainnya:'💼 Lainnya'};
+      const parts=Object.entries(inc.byOwner)
+        .filter(([,v])=>v>0)
+        .map(([k,v])=>`<span style="margin-right:14px"><strong>${ownerLabels[k]||k}:</strong> ${fmt(v)}</span>`)
+        .join('');
+      bd.innerHTML=parts||'<span style="opacity:.8">-</span>';
+    }
+  }
+
+  // 🔍 HITUNG NET WORTH (Total Balance Semua Pos)
+  const nw = D.posList.reduce((s,p) => s + (p.balance || 0), 0);
+  
+  // Debug log
+  console.log('💎 NET WORTH CALCULATION:');
+  console.log('Total Pos:', D.posList.length);
+  D.posList.forEach(p => {
+    console.log(`  - ${p.name}: ${fmt(p.balance || 0)}`);
+  });
+  console.log('NET WORTH TOTAL:', fmt(nw));
+  
+  document.getElementById('netWorth').textContent = fmt(nw);
+  renderPosGrid();
+}
+
+function renderPosGrid(){
+  const grid=document.getElementById('posGrid');
+  if(!D.posList.length){
+    grid.innerHTML=`<div class="card" style="grid-column:1/-1;text-align:center;padding:36px;background:rgba(255,255,255,.05)"><div class="empty-icon">💳</div><p style="color:#fff;opacity:.7;margin-bottom:14px">Belum ada pos.</p><button class="btn btn-primary" onclick="showAddPosModal()">+ Tambah Pos Pertama</button></div>`;
+    return;
+  }
+  const nwTotal=D.posList.reduce((s,p)=>s+p.balance,0);
+  grid.innerHTML=D.posList.map(p=>{
+    const pct=p.target>0?Math.min((p.balance/p.target)*100,100).toFixed(1):null;
+    const pctNW=nwTotal>0?(p.balance/nwTotal*100).toFixed(1):0;
+    const catColors={needs:'var(--needs)',savings:'var(--savings)',wants:'var(--wants)'};
+    return `
+    <div class="pos-card ${p.category||'savings'}">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+        <div style="font-size:20px">${p.icon||'💰'} <span style="font-weight:700;font-size:14px">${p.name}</span></div>
+        <span class="pos-badge ${p.category||'savings'}">${p.category==='needs'?'Needs':p.category==='wants'?'Wants':'Savings'}</span>
+      </div>
+      <div style="font-size:24px;font-weight:800;font-family:'JetBrains Mono',monospace;margin-bottom:3px">${fmt(p.balance)}</div>
+      <div style="font-size:11px;color:var(--gray);margin-bottom:${p.target?'8px':'6px'}">${pctNW}% dari total aset</div>
+      ${p.target?`
+        <div style="font-size:11px;color:var(--gray);margin-bottom:4px">Target: ${fmt(p.target)} · ${pct}%</div>
+        <div class="progress-bar" style="height:7px;margin-bottom:8px"><div class="progress-fill" style="width:${pct}%;background:${catColors[p.category]||'var(--savings)'}"></div></div>
+      `:''}
+      ${p.platform?`<div style="font-size:11px;background:#f0fdf4;color:#065f46;padding:4px 8px;border-radius:6px;margin-bottom:6px;font-weight:600">🏦 ${p.platform}</div>`:''}
+      ${p.notes?`<div style="font-size:11px;color:var(--gray);background:#f8fafc;padding:6px 8px;border-radius:6px;margin-bottom:8px;line-height:1.5;border-left:3px solid var(--gray-light)">📝 ${p.notes}</div>`:''}
+      <div style="display:flex;gap:7px">
+        <button onclick="editPosModal(${p.id})" class="btn btn-primary btn-sm" style="flex:1">✏️ Edit</button>
+        <button onclick="deletePos(${p.id})" class="btn btn-danger btn-sm">🗑️</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ==================== EMOJI PICKER DATA ====================
+const emojiCategories = {
+  '💰 Keuangan': ['💰','💵','💴','💶','💷','💸','🏦','💳','🪙','📈','📉','📊','💹','🏧'],
+  '🏠 Properti': ['🏠','🏡','🏢','🏗️','🔑','🪟','🛋️','🏘️','🏚️','🏣'],
+  '🚗 Kendaraan': ['🚗','🚕','🚙','🛻','🚌','🏍️','🛵','✈️','🚢','🚂'],
+  '🎯 Goals':    ['🎯','🏆','🥇','🎖️','🌟','⭐','🚀','💎','👑','🔥'],
+  '📚 Pendidikan':['📚','🎓','📖','✏️','🏫','💡','🔬','🎒','📝','🖊️'],
+  '🏥 Kesehatan':['🏥','💊','🩺','🩹','❤️','🧬','💪','🧘','🍎','🌿'],
+  '🎬 Hiburan':  ['🎬','🎮','🎵','🎸','🎨','🎭','🎪','🎠','🏖️','🌴'],
+  '👨‍👩‍👧‍👦 Keluarga':['👨‍👩‍👧‍👦','👶','🧒','👧','👦','👨','👩','❤️','🎁','🥂'],
+};
+
+const platformsByCategory = {
+  savings: ['BCA Tabungan','Mandiri Tabungan','BRI Tabungan','BNI Tabungan','DANA','OVO','GoPay','Deposito BCA','Deposito Mandiri'],
+  needs:   ['BCA','Mandiri','BRI','GoPay','DANA','OVO','ShopeePay','Cash'],
+  wants:   ['BCA','GoPay','DANA','OVO','ShopeePay','Cash'],
+  investasi:['Bibit','Bareksa','IPOT','Stockbit','Pluang','Jenius','Ajaib','Tokopedia Emas'],
+};
+const platformsInvest = ['Bibit','Bareksa','IPOT','Stockbit','Pluang','Ajaib','Jenius Stok'];
+
+function buildEmojiPicker(gridId, catBtnId, iconInputId, iconPreviewId){
+  const catKeys = Object.keys(emojiCategories);
+  let activeCat = catKeys[0];
+
+  function renderGrid(cat){
+    const gridEl = document.getElementById(gridId);
+    if(!gridEl) return;
+    gridEl.innerHTML = emojiCategories[cat].map(e=>`
+      <span onclick="selectEmoji('${e}','${iconInputId}','${iconPreviewId}')"
+        style="font-size:22px;cursor:pointer;padding:5px;border-radius:8px;transition:background .15s"
+        onmouseover="this.style.background='#e2e8f0'" onmouseout="this.style.background=''">${e}</span>
+    `).join('');
+  }
+
+  if(catBtnId){
+    const catEl = document.getElementById(catBtnId);
+    if(catEl){
+      catEl.innerHTML = catKeys.map(k=>`
+        <button type="button" onclick="switchEmojiCat('${k}','${gridId}','${catBtnId}','${iconInputId}','${iconPreviewId}',this)"
+          style="padding:4px 10px;border:2px solid var(--gray-light);border-radius:20px;font-size:11px;font-weight:600;cursor:pointer;background:${k===activeCat?'var(--primary)':'#fff'};color:${k===activeCat?'#fff':'#64748b'};font-family:'Plus Jakarta Sans',sans-serif;transition:all .2s">${k}</button>
+      `).join('');
+    }
+  }
+  renderGrid(activeCat);
+}
+
+function switchEmojiCat(cat, gridId, catBtnId, iconInputId, iconPreviewId, btn){
+  document.querySelectorAll(`#${catBtnId} button`).forEach(b=>{
+    b.style.background='#fff'; b.style.color='#64748b';
+  });
+  btn.style.background='var(--primary)'; btn.style.color='#fff';
+  const gridEl = document.getElementById(gridId);
+  if(!gridEl) return;
+  gridEl.innerHTML = emojiCategories[cat].map(e=>`
+    <span onclick="selectEmoji('${e}','${iconInputId}','${iconPreviewId}')"
+      style="font-size:22px;cursor:pointer;padding:5px;border-radius:8px;transition:background .15s"
+      onmouseover="this.style.background='#e2e8f0'" onmouseout="this.style.background=''">${e}</span>
+  `).join('');
+}
+
+function selectEmoji(e, inputId, previewId){
+  const inp = document.getElementById(inputId);
+  const prev = document.getElementById(previewId);
+  if(inp) inp.value = e;
+  if(prev) prev.textContent = e;
+}
+
+function buildPlatformSuggestions(containerId, category, inputId){
+  const el = document.getElementById(containerId);
+  if(!el) return;
+  const platforms = platformsByCategory[category] || platformsByCategory.savings;
+  // Also add invest platforms if savings
+  const all = category==='savings' ? [...platforms, ...platformsInvest] : platforms;
+  const unique = [...new Set(all)];
+  el.innerHTML = unique.map(p=>`
+    <button type="button" onclick="selectPlatform('${p}','${inputId}',this)"
+      style="padding:5px 10px;border:2px solid var(--gray-light);border-radius:20px;font-size:11px;font-weight:600;cursor:pointer;background:#fff;font-family:'Plus Jakarta Sans',sans-serif;transition:all .2s"
+      onmouseover="this.style.borderColor='var(--primary)'" onmouseout="if(!this.dataset.selected) this.style.borderColor='var(--gray-light)'">${p}</button>
+  `).join('');
+}
+
+function selectPlatform(p, inputId, btn){
+  const inp = document.getElementById(inputId);
+  if(inp) inp.value = p;
+  document.querySelectorAll(`#${btn.parentElement.id} button`).forEach(b=>{
+    b.style.borderColor='var(--gray-light)'; b.style.background='#fff'; b.style.color='#64748b';
+    delete b.dataset.selected;
+  });
+  btn.style.borderColor='var(--primary)'; btn.style.background='var(--primary)'; btn.style.color='#fff';
+  btn.dataset.selected='1';
+}
+
+// ==================== POS MANAGEMENT ====================
+function showAddPosModal(){
+  document.getElementById('addPosForm').reset();
+  document.getElementById('posIcon').value='💰';
+  document.getElementById('posIconPreview').textContent='💰';
+  document.getElementById('posCategory').value='savings';
+  document.getElementById('posNotes').value='';
+  document.getElementById('posPlatform').value='';
+  // Build emoji picker
+  buildEmojiPicker('emojiGrid','emojiCatBtns','posIcon','posIconPreview');
+  // Build platform suggestions
+  buildPlatformSuggestions('platformSuggestions','savings','posPlatform');
+  // Update platforms when category changes
+  document.getElementById('posCategory').onchange = function(){
+    buildPlatformSuggestions('platformSuggestions', this.value, 'posPlatform');
+  };
+  // Render templates
+  document.getElementById('templateGrid').innerHTML = posTemplates.map((t,i)=>`
+    <div class="template-btn" onclick="applyTemplate(${i})">
+      <div class="template-icon">${t.icon}</div>
+      <div class="template-name">${t.name}</div>
+      <div class="template-cat">${t.category==='needs'?'Needs':t.category==='wants'?'Wants':'Savings'}</div>
+    </div>`).join('');
+  showModal('mAddPos');
+  setTimeout(()=>{ setupRp('posTarget'); setupRp('posBalance'); },100);
+}
+
+function applyTemplate(i){
+  const t=posTemplates[i];
+  document.getElementById('posName').value=t.name;
+  document.getElementById('posCategory').value=t.category;
+  document.getElementById('posIcon').value=t.icon;
+  document.getElementById('posIconPreview').textContent=t.icon;
+  document.getElementById('posTarget').value=t.target>0?fmtI(String(t.target)):'';
+  document.getElementById('posBalance').value='0';
+  // Platform suggestions for this template
+  const platMap={
+    'Dana Darurat':'BCA Tabungan',
+    'Dana Pendidikan Anak':'Bibit',
+    'DP Mobil Usaha':'BCA Tabungan',
+    'DP Rumah':'Deposito BCA',
+    'Reksadana':'Bibit',
+    'Investasi Emas':'Pluang',
+  };
+  if(platMap[t.name]){
+    document.getElementById('posPlatform').value=platMap[t.name];
+  }
+  buildPlatformSuggestions('platformSuggestions', t.category, 'posPlatform');
+  document.querySelector('.template-grid').querySelectorAll('.template-btn').forEach((b,j)=>b.classList.toggle('selected',j===i));
+}
+
+document.getElementById('addPosForm').addEventListener('submit',e=>{
+  e.preventDefault();
+  const pos={
+    id:Date.now(),
+    name:document.getElementById('posName').value,
+    category:document.getElementById('posCategory').value,
+    icon:document.getElementById('posIcon').value||'💰',
+    target:parseRp(document.getElementById('posTarget').value),
+    balance:parseRp(document.getElementById('posBalance').value),
+    platform:document.getElementById('posPlatform').value.trim(),
+    notes:document.getElementById('posNotes').value.trim(),
+    created:new Date().toISOString()
+  };
+  D.posList.push(pos);
+  saveD(); renderAlokasi(); renderBudget();
+  closeModal('mAddPos');
+  alert(`✅ Pos "${pos.name}" berhasil ditambahkan!${pos.platform?' Disimpan di: '+pos.platform:''}`);
+});
+
+function editPosModal(id){
+  const p=D.posList.find(x=>x.id===id);
+  if(!p) return;
+  document.getElementById('editPosId').value=id;
+  document.getElementById('editPosName').value=p.name;
+  document.getElementById('editPosIcon').value=p.icon||'💰';
+  document.getElementById('editPosIconPreview').textContent=p.icon||'💰';
+  document.getElementById('editPosCategory').value=p.category||'savings';
+  document.getElementById('editPosTarget').value=p.target>0?fmtI(String(p.target)):'';
+  document.getElementById('editPosBalance').value=fmtI(String(p.balance));
+  document.getElementById('editPosPlatform').value=p.platform||'';
+  document.getElementById('editPosNotes').value=p.notes||'';
+  // Build mini emoji grid (no categories for edit, just popular)
+  const popularEmojis=['💰','🚨','🎓','🏡','🚗','📈','💎','🏦','🌟','🎯','💊','🎬','👨‍👩‍👧‍👦','🔑','✈️','🪙','🏖️','💵','📚','🛡️','🚀','⭐'];
+  document.getElementById('editEmojiGrid').innerHTML = popularEmojis.map(e=>`
+    <span onclick="selectEmoji('${e}','editPosIcon','editPosIconPreview')"
+      style="font-size:22px;cursor:pointer;padding:5px;border-radius:8px;transition:background .15s"
+      onmouseover="this.style.background='#e2e8f0'" onmouseout="this.style.background=''">${e}</span>
+  `).join('');
+  buildPlatformSuggestions('editPlatformSuggestions', p.category||'savings', 'editPosPlatform');
+  document.getElementById('editPosCategory').onchange = function(){
+    buildPlatformSuggestions('editPlatformSuggestions', this.value, 'editPosPlatform');
+  };
+  showModal('mEditPos');
+  setTimeout(()=>{ setupRp('editPosTarget'); setupRp('editPosBalance'); },100);
+}
+
+document.getElementById('editPosForm').addEventListener('submit',e=>{
+  e.preventDefault();
+  const id=parseInt(document.getElementById('editPosId').value);
+  const p=D.posList.find(x=>x.id===id);
+  if(!p) return;
+  p.name    = document.getElementById('editPosName').value;
+  p.icon    = document.getElementById('editPosIcon').value||'💰';
+  p.category= document.getElementById('editPosCategory').value;
+  p.target  = parseRp(document.getElementById('editPosTarget').value);
+  p.balance = parseRp(document.getElementById('editPosBalance').value);
+  p.platform= document.getElementById('editPosPlatform').value.trim();
+  p.notes   = document.getElementById('editPosNotes').value.trim();
+  saveD(); renderAlokasi(); renderBudget();
+  closeModal('mEditPos');
+  alert(`✅ Pos "${p.name}" berhasil diupdate!`);
+});
+
+// ==================== POS TEMPLATES ====================
+const posTemplates = [
+  {icon:'🚨',name:'Dana Darurat',category:'savings',target:36000000},
+  {icon:'🎓',name:'Dana Pendidikan Anak',category:'savings',target:50000000},
+  {icon:'🚗',name:'DP Mobil Usaha',category:'savings',target:20000000},
+  {icon:'🏡',name:'DP Rumah',category:'savings',target:40000000},
+  {icon:'📈',name:'Reksadana',category:'savings',target:0},
+  {icon:'💎',name:'Investasi Emas',category:'savings',target:0},
+  {icon:'🏠',name:'Sewa Rumah',category:'needs',target:0},
+  {icon:'🛒',name:'Belanja Bulanan',category:'needs',target:0},
+  {icon:'🎬',name:'Hiburan',category:'wants',target:0},
+  {icon:'✈️',name:'Dana Liburan',category:'wants',target:10000000},
+  {icon:'💊',name:'Kesehatan',category:'needs',target:0},
+  {icon:'📱',name:'Gadget/Tech',category:'wants',target:0},
+];
+
+
+function deletePos(id){
+  if(!confirm('Hapus pos ini?')) return;
+  D.posList=D.posList.filter(p=>p.id!==id);
+  saveD(); renderAlokasi(); renderBudget();
+}
+
+
+// Allocate Modal
+function showAllocModal(){
+  const m=getMonthTotals();
+  if(m.sisa<=0){alert('⚠️ Tidak ada sisa bulan ini!');return;}
+  if(!D.posList.length){alert('⚠️ Tambah pos terlebih dahulu!');showAddPosModal();return;}
+  document.getElementById('mAllocSisa').textContent=fmt(m.sisa);
+  const container=document.getElementById('allocInputs');
+  container.innerHTML=D.posList.map(p=>`
+    <div class="form-group">
+      <label>${p.icon||'💰'} ${p.name} <span style="font-size:11px;color:var(--gray)">(${fmt(p.balance)})</span></label>
+      <input type="text" id="ai_${p.id}" placeholder="0" inputmode="numeric" oninput="updateAllocTotal(${m.sisa})" style="font-weight:700">
+    </div>`).join('');
+  setTimeout(()=>D.posList.forEach(p=>setupRp(`ai_${p.id}`)),100);
+  document.getElementById('allocTotal').textContent=fmt(0);
+  document.getElementById('allocRemain').textContent=fmt(m.sisa);
+  showModal('mAlloc');
+}
+
+function updateAllocTotal(max){
+  let total=0;
+  D.posList.forEach(p=>{total+=parseRp(document.getElementById(`ai_${p.id}`)?.value||'0');});
+  document.getElementById('allocTotal').textContent=fmt(total);
+  document.getElementById('allocRemain').textContent=fmt(max-total);
+  document.getElementById('allocRemain').style.color=total>max?'var(--danger)':'var(--primary)';
+}
+
+document.getElementById('allocForm').addEventListener('submit',e=>{
+  e.preventDefault();
+  
+  const m=getMonthTotals();
+  
+  let total=0;
+  const updates=[];
+  D.posList.forEach(p=>{
+    const amt=parseRp(document.getElementById(`ai_${p.id}`)?.value||'0');
+    total+=amt; updates.push({id:p.id,amt,name:p.name});
+  });
+  
+  if(total>m.sisa){
+    alert(`❌ Total alokasi (${fmt(total)}) melebihi dana sisa (${fmt(m.sisa)})!`);
+    return;
+  }
+  
+  if(total===0){
+    alert(`⚠️ Belum ada nominal yang dialokasikan!`);
+    return;
+  }
+  
+  // Konfirmasi dulu
+  if(!confirm(`Alokasikan ${fmt(total)} ke pos?\n\nDana sisa akan berkurang dari ${fmt(m.sisa)} menjadi ${fmt(m.sisa - total)}`)){
+    return;
+  }
+  
+  // 1. UPDATE BALANCE POS
+  updates.forEach(u=>{
+    const p=D.posList.find(x=>x.id===u.id);
+    if(p) p.balance+=u.amt;
+  });
+  
+  // 2. BUAT TRANSAKSI PENGELUARAN untuk setiap alokasi
+  const now = new Date().toISOString().split('T')[0];
+  updates.forEach(u => {
+    if(u.amt > 0) {
+      D.transactions.push({
+        id: Date.now() + '_' + Math.random().toString(36).substr(2,9),
+        date: now,
+        type: 'expense',
+        category: 'Alokasi',
+        desc: `Alokasi ke ${u.name}`,
+        amount: u.amt,
+        owner: 'saya'
+      });
+    }
+  });
+  
+  // 3. SAVE & RELOAD SEMUA
+  saveD(); 
+  
+  // 4. TUTUP MODAL DULU
+  closeModal('mAlloc');
+  
+  // 5. FORCE RELOAD DATA DARI LOCALSTORAGE
+  loadD();
+  
+  // 6. RENDER ULANG SEMUA
+  renderDashboard(); 
+  renderAlokasi(); 
+  renderBudget(); 
+  updateHeader();
+  
+  // 7. CEK HASIL
+  const mAfter = getMonthTotals();
+  const nwAfter = D.posList.reduce((s,p) => s + (p.balance || 0), 0);
+  
+  // 8. ALERT SUCCESS dengan info lengkap
+  alert(
+    `✅ ALOKASI BERHASIL!\n\n` +
+    `💰 Total dialokasikan: ${fmt(total)}\n\n` +
+    `📊 DANA SISA:\n` +
+    `   Sebelum: ${fmt(m.sisa)}\n` +
+    `   Sekarang: ${fmt(mAfter.sisa)}\n\n` +
+    `💎 NET WORTH (Total Aset):\n` +
+    `   Sekarang: ${fmt(nwAfter)}\n\n` +
+    `${mAfter.sisa === m.sisa - total ? '✅ Perhitungan BENAR!' : '⚠️ Ada yang tidak sesuai, refresh halaman!'}`
+  );
+});
+
+// ==================== BUDGET PLAN ====================
+function renderBudget(){
+  if(!currentUser) return;
+  const rule = currentUser.budgetRule || {needs:50,savings:40,wants:10};
+  const inc = getDynamicIncome();  // DYNAMIC dari transaksi!
+  const total = inc.total;
+  const now = new Date();
+  const bulanIni = now.toLocaleDateString('id-ID',{month:'long',year:'numeric'});
+
+  // Income summary cards (dynamic per owner)
+  const ownerColors={saya:'linear-gradient(135deg,#10b981,#059669)',pasangan:'linear-gradient(135deg,#3b82f6,#2563eb)',lainnya:'linear-gradient(135deg,#8b5cf6,#7c3aed)'};
+  const ownerLabels={saya:'👤 Income Saya',pasangan:'👥 Income Pasangan',lainnya:'💼 Income Lainnya'};
+  const incomeCards=document.getElementById('budgetIncomeCards');
+
+  if(!total){
+    incomeCards.innerHTML=`
+      <div style="background:rgba(255,255,255,.07);border-radius:14px;padding:20px;color:#fff;text-align:center;grid-column:1/-1">
+        <div style="font-size:32px;margin-bottom:8px">💰</div>
+        <div style="font-size:15px;font-weight:700;margin-bottom:4px">Belum Ada Income Bulan Ini</div>
+        <div style="font-size:13px;opacity:.7;margin-bottom:12px">${bulanIni}</div>
+        <button onclick="switchTab('dashboard',document.querySelector('.nav-btn'))" style="background:var(--primary);color:#fff;border:none;padding:9px 18px;border-radius:8px;font-weight:700;cursor:pointer;font-size:13px">➕ Tambah Income di Dashboard</button>
+      </div>`;
+  } else {
+    // Cards per owner + total
+    let cards = Object.entries(inc.byOwner)
+      .filter(([,v])=>v>0)
+      .map(([k,v])=>`
+        <div style="background:${ownerColors[k]||ownerColors.lainnya};border-radius:14px;padding:16px;color:#fff">
+          <div style="font-size:11px;opacity:.85;margin-bottom:4px">${ownerLabels[k]||k}</div>
+          <div style="font-size:20px;font-weight:800;font-family:'JetBrains Mono',monospace">${fmt(v)}</div>
+          <div style="font-size:11px;opacity:.7;margin-top:3px">${(v/total*100).toFixed(1)}% dari total</div>
+        </div>`).join('');
+    // Tambah total card
+    cards += `
+      <div style="background:linear-gradient(135deg,#f59e0b,#d97706);border-radius:14px;padding:16px;color:#fff">
+        <div style="font-size:11px;opacity:.85;margin-bottom:4px">💎 Total ${bulanIni}</div>
+        <div style="font-size:20px;font-weight:800;font-family:'JetBrains Mono',monospace">${fmt(total)}</div>
+        <div style="font-size:11px;opacity:.7;margin-top:3px">${inc.transactions.length} sumber income</div>
+      </div>`;
+    incomeCards.innerHTML=cards;
+  }
+
+  // Income detail breakdown per kategori
+  const detailEl=document.getElementById('budgetIncomeDetail');
+  if(detailEl){
+    if(!total){
+      detailEl.innerHTML=`<div style="text-align:center;padding:12px;color:var(--gray);font-size:13px">Belum ada income bulan ini</div>`;
+    } else {
+      // Group by owner dan category
+      const ownerLabelsShort={saya:'👤 Saya',pasangan:'👥 Pasangan',lainnya:'💼 Lainnya'};
+      detailEl.innerHTML = Object.entries(inc.ownerDetails)
+        .filter(([,txs])=>txs&&txs.length>0)
+        .map(([owner,txs])=>{
+          const ownerTotal=txs.reduce((s,t)=>s+t.amount,0);
+          const rows=txs.map(t=>`
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 10px;background:#f8fafc;border-radius:8px;margin-bottom:5px">
+              <div>
+                <div style="font-weight:600;font-size:13px">${t.description}</div>
+                <div style="font-size:11px;color:var(--gray)">${t.category} · ${new Date(t.date).toLocaleDateString('id-ID',{day:'2-digit',month:'short'})}</div>
+              </div>
+              <div style="font-weight:800;font-family:'JetBrains Mono',monospace;font-size:14px;color:var(--success)">+${fmt(t.amount)}</div>
+            </div>`).join('');
+          return `
+            <div style="margin-bottom:14px">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+                <div style="font-weight:700;font-size:14px">${ownerLabelsShort[owner]||owner}</div>
+                <div style="font-weight:800;font-family:'JetBrains Mono',monospace;font-size:15px;color:var(--success)">${fmt(ownerTotal)}</div>
+              </div>
+              ${rows}
+            </div>`;
+        }).join('');
+
+      // Summary per kategori
+      const catSummary=Object.entries(inc.byCategory)
+        .sort(([,a],[,b])=>b-a)
+        .map(([cat,amt])=>`
+          <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #f1f5f9;font-size:13px">
+            <span>${cat}</span><span style="font-weight:700;font-family:'JetBrains Mono',monospace">${fmt(amt)}</span>
+          </div>`).join('');
+      if(catSummary){
+        detailEl.innerHTML+=`
+          <div style="background:#f8fafc;padding:12px;border-radius:10px;margin-top:4px">
+            <div style="font-weight:700;font-size:13px;margin-bottom:8px;color:var(--gray)">📂 Per Kategori:</div>
+            ${catSummary}
+          </div>`;
+      }
+    }
+  }
+
+  // Budget buckets (uses dynamic total)
+  const buckets = [
+    {key:'needs',  label:'🏠 NEEDS',   color:'var(--needs)',   bg:'#dbeafe', textColor:'#1e40af', pct:rule.needs},
+    {key:'savings',label:'💰 SAVINGS', color:'var(--savings)', bg:'#d1fae5', textColor:'#065f46', pct:rule.savings},
+    {key:'wants',  label:'🎉 WANTS',   color:'var(--wants)',   bg:'#fef3c7', textColor:'#92400e', pct:rule.wants},
+  ];
+
+  document.getElementById('budgetBuckets').innerHTML = buckets.map(b=>{
+    const budgetAmt = total * b.pct / 100;
+    const bucketPos = D.posList.filter(p=>p.category===b.key);
+    const actualTotal = bucketPos.reduce((s,p)=>s+p.balance,0);
+    const items = bucketPos.map(p=>`
+      <div class="bucket-item" style="background:${b.bg};border-color:${b.color}">
+        <div class="bucket-item-name">${p.icon||'💰'} ${p.name}</div>
+        <div class="bucket-item-amount" style="color:${b.textColor}">${fmt(p.balance)}</div>
+        ${p.target?`<div class="bucket-item-sub">Target: ${fmt(p.target)}</div>`:''}
+      </div>`).join('');
+    return `
+    <div class="budget-bucket">
+      <div class="bucket-header">
+        <div class="bucket-title">
+          ${b.label}
+          <span class="bucket-pct-badge" style="background:${b.bg};color:${b.textColor}">${b.pct}%</span>
+        </div>
+        <div class="bucket-amount" style="color:${b.color}">${total>0?fmt(budgetAmt):'—'}</div>
+      </div>
+      <div class="progress-bar"><div class="progress-fill" style="width:${b.pct}%;background:${b.color}"></div></div>
+      <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--gray);margin:6px 0 10px">
+        <span>${bucketPos.length} pos · Saldo: ${fmt(actualTotal)}</span>
+        <span>${total>0?'Budget: '+fmt(budgetAmt):'Tambah income dulu!'}</span>
+      </div>
+      ${bucketPos.length?`<div class="bucket-items">${items}</div>`:`<div style="text-align:center;padding:14px;background:#f8fafc;border-radius:10px;color:var(--gray);font-size:13px">Belum ada pos ${b.label} — <button onclick="showAddPosModal()" style="background:none;border:none;color:var(--primary);font-weight:700;cursor:pointer">+ Tambah</button></div>`}
+    </div>`;
+  }).join('');
+
+  // Progress savings pos with target
+  const savingsWithTarget = D.posList.filter(p=>p.category==='savings'&&p.target>0);
+  const goalsEl = document.getElementById('budgetGoals');
+  if(!savingsWithTarget.length){
+    goalsEl.innerHTML=`<div class="card"><div class="empty"><div class="empty-icon">🎯</div><p>Tambah pos Savings dengan target untuk melihat progress!</p></div></div>`;
+  } else {
+    const monthlySav = total*(rule.savings||40)/100;
+    goalsEl.innerHTML = savingsWithTarget.map(p=>{
+      const pct=Math.min((p.balance/p.target)*100,100).toFixed(1);
+      const remaining=Math.max(p.target-p.balance,0);
+      const monthlyShare=savingsWithTarget.length>0?monthlySav/savingsWithTarget.length:0;
+      const monthsLeft=monthlyShare>0?Math.ceil(remaining/monthlyShare):0;
+      return `
+      <div class="goal-card" style="border-left:4px solid var(--savings)">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">
+          <div><div style="font-size:16px;font-weight:700">${p.icon||'💰'} ${p.name}</div></div>
+          <div style="font-size:18px;font-weight:800;font-family:'JetBrains Mono',monospace;color:var(--savings)">${pct}%</div>
+        </div>
+        <div class="progress-bar" style="margin-bottom:6px"><div class="progress-fill" style="width:${pct}%;background:var(--savings)"></div></div>
+        <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--gray);margin-bottom:10px">
+          <span>${fmt(p.balance)} terkumpul</span><span>Target: ${fmt(p.target)}</span>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">
+          <div style="text-align:center;padding:8px;background:#d1fae5;border-radius:8px">
+            <div style="font-size:10px;color:var(--gray);margin-bottom:2px">Terkumpul</div>
+            <div style="font-weight:800;font-size:12px;font-family:'JetBrains Mono',monospace">${fmt(p.balance)}</div>
+          </div>
+          <div style="text-align:center;padding:8px;background:#d1fae5;border-radius:8px">
+            <div style="font-size:10px;color:var(--gray);margin-bottom:2px">Kurang</div>
+            <div style="font-weight:800;font-size:12px;font-family:'JetBrains Mono',monospace">${fmt(remaining)}</div>
+          </div>
+          <div style="text-align:center;padding:8px;background:#d1fae5;border-radius:8px">
+            <div style="font-size:10px;color:var(--gray);margin-bottom:2px">Estimasi</div>
+            <div style="font-weight:800;font-size:12px">${monthsLeft>0?monthsLeft+' bln':'✅ DONE!'}</div>
+          </div>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  renderTimeline(total);
+}
+
+function renderTimeline(total){
+  const monthly = total * ((currentUser.budgetRule?.savings||40)/100);
+  const now = new Date();
+  const milestones = [
+    {month:3, icon:'🛡️',label:`Emergency Fund mulai terbentuk (${fmt(monthly*3)})`,color:'#3b82f6'},
+    {month:6, icon:'🎉',label:`6 bulan saving: ${fmt(monthly*6)}`,color:'#8b5cf6'},
+    {month:12,icon:'💰',label:`Saving Year 1: ${fmt(monthly*12)}`,color:'#10b981'},
+    {month:18,icon:'🚗',label:'DP Mobil kemungkinan terkumpul!',color:'#f59e0b'},
+    {month:24,icon:'📈',label:'Portfolio investasi mulai signifikan',color:'#10b981'},
+    {month:36,icon:'🏡',label:'DP Rumah/Tanah kemungkinan terkumpul!',color:'#8b5cf6'},
+    {month:60,icon:'💎',label:`Proyeksi Net Worth: ${fmt(monthly*60)}`,color:'#f59e0b'}
+  ];
+  document.getElementById('timelineEl').innerHTML = milestones.map((m,i)=>{
+    const d=new Date(now.getFullYear(),now.getMonth()+m.month,1);
+    const dateStr=d.toLocaleDateString('id-ID',{month:'long',year:'numeric'});
+    return `
+    <div class="timeline-item">
+      <div class="timeline-dot" style="background:${m.color};box-shadow:0 3px 10px ${m.color}44">${m.icon}</div>
+      ${i<milestones.length-1?'<div class="timeline-line"></div>':''}
+      <div style="flex:1;padding-bottom:6px">
+        <div style="font-size:11px;color:var(--gray);margin-bottom:2px">📅 ${dateStr} · Bulan ke-${m.month}</div>
+        <div style="font-weight:700;font-size:13px">${m.label}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ==================== SETTINGS ====================
+function loadSettingsTab(){
+  if(!currentUser) return;
+  const rule=currentUser.budgetRule||{needs:50,savings:40,wants:10};
+  const income=currentUser.income||{i1:0,i2:0};
+  document.getElementById('settingNeeds').value=rule.needs;
+  document.getElementById('settingSavings').value=rule.savings;
+  document.getElementById('settingWants').value=rule.wants;
+  document.getElementById('sIncome1').value=fmtI(String(income.i1||0));
+  document.getElementById('sIncome2').value=fmtI(String(income.i2||0));
+  updateSettingPreview();
+  setTimeout(()=>{setupRp('sIncome1');setupRp('sIncome2');},100);
+}
+
+function applyBudgetTemplateSettings(n,s,w){
+  document.getElementById('settingNeeds').value=n;
+  document.getElementById('settingSavings').value=s;
+  document.getElementById('settingWants').value=w;
+  updateSettingPreview();
+}
+
+function updateSettingPreview(){
+  const n=parseInt(document.getElementById('settingNeeds').value)||0;
+  const s=parseInt(document.getElementById('settingSavings').value)||0;
+  const w=parseInt(document.getElementById('settingWants').value)||0;
+  const total=n+s+w;
+  const income=(currentUser?.income?.i1||0)+(currentUser?.income?.i2||0);
+  const color=total===100?'var(--success)':'var(--danger)';
+  document.getElementById('settingPreview').innerHTML=`
+    <div style="font-weight:700;margin-bottom:8px;color:${color}">Total: ${total}% ${total===100?'✅':'❌ (harus 100%)'}</div>
+    <div style="display:flex;justify-content:space-between;margin-bottom:4px;font-size:13px"><span>🏠 Needs ${n}%</span><span style="font-weight:700">${fmt(income*n/100)}</span></div>
+    <div style="display:flex;justify-content:space-between;margin-bottom:4px;font-size:13px"><span>💰 Savings ${s}%</span><span style="font-weight:700">${fmt(income*s/100)}</span></div>
+    <div style="display:flex;justify-content:space-between;font-size:13px"><span>🎉 Wants ${w}%</span><span style="font-weight:700">${fmt(income*w/100)}</span></div>`;
+}
+
+function saveBudgetSettings(){
+  const n=parseInt(document.getElementById('settingNeeds').value)||0;
+  const s=parseInt(document.getElementById('settingSavings').value)||0;
+  const w=parseInt(document.getElementById('settingWants').value)||0;
+  if(n+s+w!==100){alert('Total harus 100%!');return;}
+  currentUser.budgetRule={needs:n,savings:s,wants:w};
+  const users=getAllUsers();
+  const idx=users.findIndex(u=>u.id===currentUser.id);
+  if(idx>=0){users[idx].budgetRule={needs:n,savings:s,wants:w};saveAllUsers(users);}
+  renderBudget();
+  alert('✅ Aturan budget disimpan! Budget Plan sudah diperbarui.');
+}
+
+function saveIncome(){
+  const i1=parseRp(document.getElementById('sIncome1').value);
+  const i2=parseRp(document.getElementById('sIncome2').value);
+  if(!i1){alert('Income harus diisi!');return;}
+  currentUser.income={i1,i2};
+  const users=getAllUsers();
+  const idx=users.findIndex(u=>u.id===currentUser.id);
+  if(idx>=0){users[idx].income={i1,i2};saveAllUsers(users);}
+  updateHeader(); renderBudget();
+  alert('✅ Income diupdate! Semua kalkulasi disesuaikan.');
+}
+
+function resetUserData(){
+  if(!confirm('⚠️ Yakin? Semua data akan dihapus permanen!')) return;
+  D={transactions:[],posList:[],debts:[],goals:[],achievements:initAch()};
+  saveD(); renderDashboard(); renderAlokasi(); renderBudget();
+  alert('✅ Data direset.');
+}
+
+// ==================== DEBTS ====================
+function renderDebts(){
+  const total=D.debts.reduce((s,d)=>s+Math.max(d.total-d.paid,0),0);
+  document.getElementById('totalDebt').textContent=fmt(total);
+  document.getElementById('debtSubtitle').textContent=total>0?`${D.debts.filter(d=>d.paid<d.total).length} utang aktif · Semangat lunasi! 💪`:'🎉 Semua utang LUNAS!';
+  const el=document.getElementById('debtList');
+  if(!D.debts.length){el.innerHTML=`<div class="card"><div class="empty"><div class="empty-icon">💳</div><p>Belum ada catatan utang</p></div></div>`;return;}
+  el.innerHTML=D.debts.map(d=>{
+    const rem=Math.max(d.total-d.paid,0);
+    const pct=Math.min((d.paid/d.total)*100,100).toFixed(1);
+    const lunas=rem<=0;
+    const monthsLeft=d.monthly>0?Math.ceil(rem/d.monthly):0;
+    return `
+    <div class="debt-card ${lunas?'lunas':''}">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+        <div style="font-size:16px;font-weight:700">💳 ${d.name}</div>
+        <span style="padding:4px 10px;border-radius:20px;font-size:11px;font-weight:700;background:${lunas?'#d1fae5':'#fef3c7'};color:${lunas?'#065f46':'#92400e'}">${lunas?'✅ LUNAS':'⏳ Aktif'}</span>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:8px;margin-bottom:12px">
+        <div style="background:#fef3c7;padding:10px;border-radius:8px"><div style="font-size:10px;color:var(--gray);margin-bottom:2px">Total Utang</div><div style="font-weight:800;font-size:13px;font-family:'JetBrains Mono',monospace">${fmt(d.total)}</div></div>
+        <div style="background:#d1fae5;padding:10px;border-radius:8px"><div style="font-size:10px;color:var(--gray);margin-bottom:2px">Sudah Bayar</div><div style="font-weight:800;font-size:13px;font-family:'JetBrains Mono',monospace;color:var(--success)">${fmt(d.paid)}</div></div>
+        <div style="background:#fee2e2;padding:10px;border-radius:8px"><div style="font-size:10px;color:var(--gray);margin-bottom:2px">Sisa Utang</div><div style="font-weight:800;font-size:13px;font-family:'JetBrains Mono',monospace;color:var(--danger)">${fmt(rem)}</div></div>
+        ${d.monthly?`<div style="background:#eff6ff;padding:10px;border-radius:8px"><div style="font-size:10px;color:var(--gray);margin-bottom:2px">Cicilan/Bln</div><div style="font-weight:800;font-size:13px;font-family:'JetBrains Mono',monospace;color:var(--primary)">${fmt(d.monthly)}</div></div>`:''}
+      </div>
+      <div style="margin-bottom:6px">
+        <div style="display:flex;justify-content:space-between;font-size:12px;font-weight:600;margin-bottom:5px"><span>Progress Lunas</span><span style="color:var(--success)">${pct}%</span></div>
+        <div class="progress-bar" style="height:12px"><div class="progress-fill" style="width:${pct}%;background:linear-gradient(90deg,var(--warning),var(--success))"></div></div>
+      </div>
+      ${d.note?`<div style="font-size:12px;color:var(--gray);margin:6px 0">📝 ${d.note}</div>`:''}
+      ${!lunas&&d.monthly?`<div style="font-size:12px;color:var(--primary);font-weight:600;margin-bottom:8px">⏰ Estimasi lunas: ${monthsLeft} bulan lagi</div>`:''}
+      ${!lunas?`<div style="display:flex;gap:7px"><button onclick="showPayDebtModal(${d.id})" class="btn btn-warning btn-sm" style="flex:1">💳 Bayar</button><button onclick="deleteDebt(${d.id})" class="btn btn-danger btn-sm">🗑️</button></div>`:`<button onclick="deleteDebt(${d.id})" class="btn btn-ghost btn-sm btn-block">🗑️ Hapus</button>`}
+    </div>`;
+  }).join('');
+}
+
+function showAddDebtModal(){document.getElementById('addDebtForm').reset();showModal('mAddDebt');setTimeout(()=>{setupRp('dTotal');setupRp('dPaid');setupRp('dMonthly');},100);}
+
+document.getElementById('addDebtForm').addEventListener('submit',e=>{
+  e.preventDefault();
+  const debt={id:Date.now(),name:document.getElementById('dName').value,total:parseRp(document.getElementById('dTotal').value),paid:parseRp(document.getElementById('dPaid').value),monthly:parseRp(document.getElementById('dMonthly').value),note:document.getElementById('dNote').value,created:new Date().toISOString()};
+  if(!debt.total){alert('Total utang harus diisi!');return;}
+  D.debts.push(debt);saveD();renderDebts();closeModal('mAddDebt');
+});
+
+function showPayDebtModal(id){
+  const d=D.debts.find(x=>x.id===id);if(!d)return;
+  document.getElementById('payDebtId').value=id;
+  document.getElementById('payDebtName').textContent=d.name;
+  document.getElementById('payDebtInfo').textContent=`Sisa: ${fmt(d.total-d.paid)} · Sudah: ${fmt(d.paid)}`;
+  document.getElementById('payAmt').value='';
+  showModal('mPayDebt');setTimeout(()=>setupRp('payAmt'),100);
+}
+
+document.getElementById('payDebtForm').addEventListener('submit',e=>{
+  e.preventDefault();
+  const id=parseInt(document.getElementById('payDebtId').value);
+  const amt=parseRp(document.getElementById('payAmt').value);
+  const d=D.debts.find(x=>x.id===id);
+  if(!d||!amt){alert('Masukkan jumlah!');return;}
+  d.paid+=amt;
+  if(d.paid>=d.total){d.paid=d.total;alert(`🎉 SELAMAT! Utang "${d.name}" LUNAS! 🎊`);}
+  else{alert(`✅ Pembayaran ${fmt(amt)} dicatat! Sisa: ${fmt(d.total-d.paid)}`);}
+  saveD();renderDebts();checkAch();closeModal('mPayDebt');
+});
+
+function deleteDebt(id){if(!confirm('Hapus?'))return;D.debts=D.debts.filter(d=>d.id!==id);saveD();renderDebts();}
+
+// ==================== INSIGHTS ====================
+function renderInsights(){
+  if(!currentUser)return;
+  const m=getMonthTotals();
+  const total=(currentUser.income?.i1||0)+(currentUser.income?.i2||0);
+  const nw=D.posList.reduce((s,p)=>s+p.balance,0);
+  const totalDebt=D.debts.reduce((s,d)=>s+Math.max(d.total-d.paid,0),0);
+  const savRate=total>0?(m.sisa/total*100):0;
+  let score=50;
+  if(m.income>0)score+=10;
+  if(savRate>=(currentUser.budgetRule?.savings||40))score+=20;
+  else if(savRate>=20)score+=10;
+  if(nw>0)score+=10;
+  if(totalDebt===0)score+=10;
+  score=Math.min(score,100);
+  document.getElementById('healthScore').textContent=score;
+  document.getElementById('healthDesc').textContent=score>=80?'🌟 Excellent! Keuangan sangat sehat!':score>=60?'✅ Good! Kondisi keuangan baik':score>=40?'⚠️ Fair. Ada yang perlu diperbaiki':'🚨 Butuh perhatian!';
+  const insights=[];
+  if(m.sisa>0)insights.push({type:'success',icon:'💰',title:`Sisa bulan ini: ${fmt(m.sisa)}`,msg:'Ada dana yang bisa dialokasikan. Jangan biarkan idle!',rec:'Alokasikan ke pos di tab Alokasi'});
+  const savingsRule=(currentUser.budgetRule?.savings||40);
+  if(savRate<savingsRule&&m.income>0)insights.push({type:'warning',icon:'📊',title:`Savings rate: ${savRate.toFixed(1)}% (target: ${savingsRule}%)`,msg:'Tingkatkan savings dengan kurangi pengeluaran tidak perlu.',rec:'Review pengeluaran Wants'});
+  if(totalDebt>0)insights.push({type:'danger',icon:'💳',title:`Total utang: ${fmt(totalDebt)}`,msg:'Prioritaskan lunasi utang sebelum investasi besar.',rec:'Gunakan Avalanche method: bayar bunga tertinggi dulu'});
+  if(nw>0)insights.push({type:'info',icon:'💎',title:`Net Worth: ${fmt(nw)}`,msg:`Aset terkumpul ${fmt(nw)}. Pertahankan dan tingkatkan!`,rec:'Diversifikasi ke investasi saham/emas'});
+  const emrg=D.posList.find(p=>p.name.toLowerCase().includes('darurat'));
+  if(emrg&&emrg.target){const ep=(emrg.balance/emrg.target*100).toFixed(1);insights.push({type:ep>=100?'success':'info',icon:'🚨',title:`Emergency Fund: ${ep}%`,msg:`${fmt(emrg.balance)} dari target ${fmt(emrg.target)}.`,rec:ep>=100?'Target tercapai! Alihkan ke investasi':'Terus konsisten menabung!'});}
+  if(!insights.length)insights.push({type:'info',icon:'💡',title:'Mulai input data',msg:'Tambah transaksi dan pos alokasi untuk mendapatkan insights.',rec:''});
+  document.getElementById('insightList').innerHTML=insights.map(ins=>`
+    <div class="insight-card ${ins.type}">
+      <div style="font-weight:700;font-size:15px;margin-bottom:5px">${ins.icon} ${ins.title}</div>
+      <div style="font-size:13px;color:var(--gray);line-height:1.6">${ins.msg}</div>
+      ${ins.rec?`<div style="margin-top:7px;padding:7px 10px;background:rgba(0,0,0,.04);border-radius:8px;font-size:12px;font-weight:600">💡 ${ins.rec}</div>`:''}
+    </div>`).join('');
+}
+
+// ==================== GOALS ====================
+function showAddGoalModal(){
+  document.getElementById('addGoalForm').reset();
+  document.getElementById('gLinkedPos').innerHTML='<option value="">-- Tidak dihubungkan --</option>'+D.posList.map(p=>`<option value="${p.id}">${p.icon||'💰'} ${p.name} (${fmt(p.balance)})</option>`).join('');
+  showModal('mAddGoal');setTimeout(()=>setupRp('gTarget'),100);
+}
+
+document.getElementById('addGoalForm').addEventListener('submit',e=>{
+  e.preventDefault();
+  const g={id:Date.now(),name:document.getElementById('gName').value,target:parseRp(document.getElementById('gTarget').value),deadline:document.getElementById('gDeadline').value,linkedPos:document.getElementById('gLinkedPos').value||null,created:new Date().toISOString()};
+  if(!g.target){alert('Target harus diisi!');return;}
+  D.goals.push(g);saveD();renderGoals();closeModal('mAddGoal');
+});
+
+function renderGoals(){
+  const el=document.getElementById('goalList');
+  if(!D.goals.length){el.innerHTML=`<div class="card"><div class="empty"><div class="empty-icon">🎯</div><p>Belum ada goal. Set target sekarang!</p><button class="btn btn-primary" onclick="showAddGoalModal()">+ Tambah Goal</button></div></div>`;return;}
+  el.innerHTML=D.goals.map(g=>{
+    const pos=g.linkedPos?D.posList.find(p=>p.id==g.linkedPos):null;
+    const current=pos?pos.balance:0;
+    const pct=Math.min((current/g.target)*100,100).toFixed(1);
+    const remaining=Math.max(g.target-current,0);
+    const deadline=new Date(g.deadline);
+    const now=new Date();
+    const daysLeft=Math.ceil((deadline-now)/86400000);
+    const monthsLeft=Math.max(Math.ceil(daysLeft/30),0);
+    const needPerMonth=monthsLeft>0?remaining/monthsLeft:0;
+    return `
+    <div class="goal-card">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">
+        <div><div style="font-size:16px;font-weight:700">🎯 ${g.name}</div>${pos?`<div style="font-size:11px;color:var(--primary);font-weight:600;margin-top:2px">📌 ${pos.icon||'💰'} ${pos.name} (auto-update)</div>`:''}</div>
+        <div style="font-size:18px;font-weight:800;font-family:'JetBrains Mono',monospace;color:var(--primary)">${pct}%</div>
+      </div>
+      <div class="progress-bar" style="margin-bottom:6px"><div class="progress-fill" style="width:${pct}%;background:linear-gradient(90deg,var(--success),var(--primary))"></div></div>
+      <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--gray);margin-bottom:8px"><span>${fmt(current)} terkumpul</span><span>Target: ${fmt(g.target)}</span></div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:7px">
+        <div style="text-align:center;padding:8px;background:#f0fdf4;border-radius:8px"><div style="font-size:10px;color:var(--gray);margin-bottom:2px">Kurang</div><div style="font-weight:800;font-size:12px;font-family:'JetBrains Mono',monospace">${fmt(remaining)}</div></div>
+        <div style="text-align:center;padding:8px;background:#eff6ff;border-radius:8px"><div style="font-size:10px;color:var(--gray);margin-bottom:2px">Perlu/Bln</div><div style="font-weight:800;font-size:12px;font-family:'JetBrains Mono',monospace">${fmt(needPerMonth)}</div></div>
+        <div style="text-align:center;padding:8px;background:#fef3c7;border-radius:8px"><div style="font-size:10px;color:var(--gray);margin-bottom:2px">Sisa Waktu</div><div style="font-weight:800;font-size:12px">${daysLeft>0?daysLeft+' hr':'Expired'}</div></div>
+      </div>
+      <button onclick="deleteGoal(${g.id})" style="margin-top:10px;width:100%;padding:7px;background:#fee2e2;color:#991b1b;border:none;border-radius:8px;font-weight:700;cursor:pointer;font-size:12px">🗑️ Hapus</button>
+    </div>`;
+  }).join('');
+}
+
+function deleteGoal(id){if(!confirm('Hapus?'))return;D.goals=D.goals.filter(g=>g.id!==id);saveD();renderGoals();}
+
+// ==================== ARTICLES ====================
+const articles=[
+  {icon:'📊',title:'Aturan Budget Personal',excerpt:'Kenapa aturan budget perlu disesuaikan untuk setiap orang.',body:'<h3>Budget itu Personal!</h3><p>Tidak ada aturan budget yang cocok untuk semua orang. 50/30/20 adalah panduan, bukan hukum mati.</p><h3>Tips Menyesuaikan Budget:</h3><p>• Jika biaya hidup tinggi: naikkan Needs ke 60%<br>• Jika mau cepat kaya: naikkan Savings ke 50%+<br>• Jika sudah mapan: bisa naikkan Wants sedikit</p><h3>Yang Terpenting:</h3><p>Savings HARUS ada minimal 20%. Di bawah itu, wealth building sangat lambat.</p>'},
+  {icon:'🚨',title:'Dana Darurat: Wajib Hukumnya!',excerpt:'Tanpa dana darurat, satu musibah bisa hancurkan keuangan.',body:'<h3>Kenapa Wajib?</h3><p>Kehilangan kerja, sakit mendadak, kendaraan rusak — semua butuh dana. Tanpa persiapan, Anda terpaksa hutang.</p><h3>Target Dana Darurat:</h3><p>• Karyawan: 3-6 bulan pengeluaran<br>• Wirausaha: 6-12 bulan pengeluaran<br>• Dengan tanggungan keluarga: 6+ bulan</p><h3>Simpan Di Mana?</h3><p>Rekening tabungan terpisah atau deposito 1 bulan. JANGAN di rekening utama!</p>'},
+  {icon:'📈',title:'Mulai Investasi dari Nol',excerpt:'Panduan lengkap untuk pemula yang mau mulai investasi.',body:'<h3>Urutan Prioritas Keuangan:</h3><p>1. Dana darurat (wajib dulu!)<br>2. Lunasi utang berbunga tinggi<br>3. Baru mulai investasi</p><h3>Pilihan Investasi Pemula:</h3><p><strong>Reksadana Pasar Uang</strong> — Return 4-6%, risiko sangat rendah, bisa mulai Rp 10.000<br><br><strong>Reksadana Pendapatan Tetap</strong> — Return 6-9%, risiko rendah<br><br><strong>Saham Blue Chip</strong> — Return 10-15%+, risiko menengah, perlu ilmu dulu</p>'},
+  {icon:'💳',title:'Keluar dari Jebakan Utang',excerpt:'Strategi proven untuk melunasi utang lebih cepat.',body:'<h3>Avalanche Method (Paling Efisien):</h3><p>Bayar minimum semua utang, lalu extra payment ke utang dengan bunga TERTINGGI dulu. Hemat bunga paling banyak.</p><h3>Snowball Method (Paling Motivating):</h3><p>Bayar minimum semua utang, lalu extra payment ke utang TERKECIL dulu. Cepat lunas satu per satu = motivasi tinggi.</p><h3>Rules Dasar:</h3><p>• Stop buat utang baru<br>• Bayar lebih dari minimum selalu<br>• Alihkan uang cicilan yang sudah lunas ke utang berikutnya</p>'},
+  {icon:'🏡',title:'Beli Rumah: Panduan Lengkap',excerpt:'Checklist dan strategi beli rumah untuk keluarga muda.',body:'<h3>Kapan Siap Beli Rumah?</h3><p>✅ Emergency fund sudah cukup<br>✅ Tidak ada utang konsumtif<br>✅ DP minimal 20% sudah terkumpul<br>✅ Cicilan KPR max 30% income<br>✅ Biaya tambahan sudah disiapkan (BPHTB, notaris, renovasi)</p><h3>Strategi Kumpulkan DP:</h3><p>• Buka rekening khusus DP<br>• Auto-debit setiap gajian<br>• Invest di reksadana pendapatan tetap<br>• Target 2-3 tahun untuk DP 20%</p>'},
+  {icon:'🚗',title:'Kendaraan untuk Usaha: Smart Move',excerpt:'Cara mengubah kendaraan menjadi aset penghasil income.',body:'<h3>Kendaraan Usaha vs Kendaraan Gaya:</h3><p><strong>Usaha:</strong> Menghasilkan income → ASET<br><strong>Gaya:</strong> Menghabiskan uang → LIABILITY</p><h3>Rekomendasi untuk Pemula:</h3><p>Pilih kendaraan fungsional dengan harga terjangkau. Gran Max / Pick Up Rp 50-70 juta lebih smart dari sedan Rp 200 juta.</p><h3>Potensi Income:</h3><p>• Jasa angkut: Rp 2-3 juta/bulan<br>• Rental harian: Rp 100-200rb/hari<br>• Ojek online: Rp 2-4 juta/bulan</p><h3>Rule:</h3><p>Cicilan kendaraan max 15% income. Di atas itu terlalu risiko.</p>'}
+];
+
+function renderArticles(){
+  document.getElementById('articleGrid').innerHTML=articles.map((a,i)=>`
+    <div class="article-card" onclick="openArticle(${i})">
+      <div style="font-size:36px;margin-bottom:10px">${a.icon}</div>
+      <div style="font-size:15px;font-weight:700;margin-bottom:6px">${a.title}</div>
+      <div style="font-size:13px;color:var(--gray);margin-bottom:12px;line-height:1.5">${a.excerpt}</div>
+      <div style="display:inline-block;background:var(--primary);color:#fff;padding:6px 12px;border-radius:8px;font-size:12px;font-weight:700">Baca →</div>
+    </div>`).join('');
+}
+
+function openArticle(i){
+  document.getElementById('artTitle').textContent=articles[i].icon+' '+articles[i].title;
+  document.getElementById('artBody').innerHTML=articles[i].body;
+  showModal('mArticle');
+}
+
+// ==================== ACHIEVEMENTS ====================
+function initAch(){
+  return [
+    {id:1,icon:'🌱',name:'Langkah Pertama',desc:'Tambah transaksi pertama',unlocked:false},
+    {id:2,icon:'📊',name:'Konsisten',desc:'5 transaksi tercatat',unlocked:false},
+    {id:3,icon:'💰',name:'Investor Pemula',desc:'Buat pos alokasi pertama',unlocked:false},
+    {id:4,icon:'🚨',name:'Safety Net',desc:'Punya pos Dana Darurat',unlocked:false},
+    {id:5,icon:'💳',name:'Debt Slayer',desc:'Lunasi satu utang',unlocked:false},
+    {id:6,icon:'🎯',name:'Goal Setter',desc:'Buat financial goal',unlocked:false},
+    {id:7,icon:'📈',name:'Investor',desc:'Punya pos investasi',unlocked:false},
+    {id:8,icon:'🏆',name:'Net Worth+',desc:'Net worth > Rp 10 juta',unlocked:false},
+    {id:9,icon:'💎',name:'Disciplined',desc:'Alokasi 3 bulan berturut-turut',unlocked:false},
+    {id:10,icon:'🌟',name:'Financial Boss',desc:'Health score > 80',unlocked:false},
+  ];
+}
+
+function checkAch(){
+  if(!D.achievements||!D.achievements.length) D.achievements=initAch();
+  const nw=D.posList.reduce((s,p)=>s+p.balance,0);
+  const m=getMonthTotals();
+  const total=(currentUser?.income?.i1||0)+(currentUser?.income?.i2||0);
+  let score=50;
+  if(m.income>0)score+=10;
+  const sav=(currentUser?.budgetRule?.savings||40);
+  if(total>0&&m.sisa/total>=sav/100)score+=20;
+  if(nw>0)score+=10;
+  if(D.debts.reduce((s,d)=>s+Math.max(d.total-d.paid,0),0)===0)score+=10;
+  score=Math.min(score,100);
+  const checks={
+    1:D.transactions.length>=1,
+    2:D.transactions.length>=5,
+    3:D.posList.length>=1,
+    4:D.posList.some(p=>p.name.toLowerCase().includes('darurat')),
+    5:D.debts.some(d=>d.paid>=d.total),
+    6:D.goals.length>=1,
+    7:D.posList.some(p=>p.category==='savings'&&(p.name.toLowerCase().includes('reksa')||p.name.toLowerCase().includes('saham')||p.name.toLowerCase().includes('emas'))),
+    8:nw>=10000000,
+    9:D.posList.length>=3,
+    10:score>=80
+  };
+  let changed=false;
+  D.achievements.forEach(a=>{ if(checks[a.id]&&!a.unlocked){a.unlocked=true;changed=true;} });
+  if(changed) saveD();
+}
+
+function renderAch(){
+  checkAch();
+  const unlocked=D.achievements.filter(a=>a.unlocked).length;
+  document.getElementById('achCount').textContent=`${unlocked}/${D.achievements.length}`;
+  document.getElementById('achGrid').innerHTML=D.achievements.map(a=>`
+    <div class="ach-card ${a.unlocked?'':'locked'}">
+      <div style="font-size:36px;margin-bottom:6px">${a.icon}</div>
+      <div style="font-weight:700;font-size:12px;margin-bottom:2px">${a.name}</div>
+      <div style="font-size:11px;color:var(--gray)">${a.desc}</div>
+      ${a.unlocked?'<div style="color:var(--success);font-weight:700;font-size:11px;margin-top:5px">✓ UNLOCKED</div>':''}
+    </div>`).join('');
+}
+
+// ==================== HEADER & TIPS ====================
+function updateHeader(){
+  if(!currentUser) return;
+  
+  const nw = D.posList.reduce((s,p) => s + (p.balance || 0), 0);
+  const totalDebt = D.debts.reduce((s,d) => s + Math.max(d.total - d.paid, 0), 0);
+  const now = new Date();
+  
+  console.log('📊 UPDATE HEADER - Net Worth:', fmt(nw));
+  
+  document.getElementById('headerSub').textContent = 
+    `Net Worth: ${fmt(nw)}${totalDebt > 0 ? ' · Utang: ' + fmt(totalDebt) : ' · Debt Free! 🎉'} · ${now.toLocaleDateString('id-ID', {weekday:'short', day:'numeric', month:'short'})}`;
+}
+
+const tips=[
+  'Sisihkan tabungan di AWAL bulan, bukan akhir. Pay yourself first!',
+  'Setiap pos alokasi yang dibuat = satu langkah menuju kebebasan finansial!',
+  'Dana darurat adalah fondasi. Tanpanya, semua rencana bisa runtuh.',
+  'Investasi terbaik adalah yang KONSISTEN, bukan yang terbesar.',
+  'Catat SEMUA pengeluaran. Rp 5.000 pun penting untuk dilacak!',
+  'Lunasi utang dengan bunga tertinggi dulu (Avalanche Method).',
+  'Kendaraan usaha menghasilkan income. Kendaraan gaya menghabiskan income.',
+  'Review keuangan setiap akhir bulan. Progress kecil tetap progress!',
+  'DP rumah 20% = cicilan lebih ringan & bunga lebih hemat.',
+  'Untuk keluarga: dana pendidikan anak dimulai HARI INI!',
+  '10% wants sudah cukup. Nikmati hidup tanpa berlebihan.',
+  'Net Worth yang naik setiap bulan = proof dari disiplin finansial Anda!',
+];
+let tipIdx=parseInt(localStorage.getItem('tipIdx'))||0;
+function showTip(){ const el=document.getElementById('dailyTip'); if(el) el.textContent=tips[tipIdx%tips.length]; }
+function changeTip(){ tipIdx=(tipIdx+1)%tips.length; localStorage.setItem('tipIdx',tipIdx); showTip(); }
+
+// ==================== AVATAR PICKER (SETUP) ====================
+const avatarPicker=document.getElementById('avatarPicker');
+if(avatarPicker){
+  avatarPicker.innerHTML='';
+  let selectedAvatar='👨‍💼';
+  AVATARS.forEach(a=>{
+    const span=document.createElement('span');
+    span.textContent=a;
+    span.style.cssText='font-size:28px;cursor:pointer;padding:5px;border-radius:8px;border:2px solid transparent;transition:all .2s';
+    span.onclick=()=>{
+      selectedAvatar=a;
+      document.querySelectorAll('#avatarPicker span').forEach(s=>s.style.borderColor='transparent');
+      span.style.borderColor='var(--primary)';
+      const users=getAllUsers();
+      const idx=users.findIndex(u=>u.id===currentUser?.id);
+      if(idx>=0){users[idx].avatar=a;currentUser.avatar=a;saveAllUsers(users);}
+    };
+    avatarPicker.appendChild(span);
+  });
+}
+
+// ==================== INIT ====================
+function init(){
+  showLoginScreen();
+  // Setup Rp inputs that exist at load time
+  setupRp('txAmt');
+  document.getElementById('txDate').valueAsDate=new Date();
+  setTxType('expense'); updateTxCats();
+}
+
+init();
+</script>
+</body>
+</html>
